@@ -8,9 +8,10 @@ library(dplyr)
 library(ggplot2)
 library(tidyr)
 library(HMDHFDplus)
+library(ggthemes)
 
 
-source("scripts/0_configs.R")
+source("scripts/0_config.R")
 source("scripts/0_settings.R")
 
 
@@ -38,16 +39,14 @@ mort_comb <- do.call(dplyr::bind_rows, mort) %>%
 
 
 
-#
-
 
 
 mort_comb %>%
     filter(Year == 2019, CNTRY == "POL") %>%
     ggplot() +
     geom_line(aes(x = Age, y = value, col = Sex)) +
-    theme_bw() +
-    scale_y_log10()
+    scale_y_log10() +
+    theme_base()
 
 
 
@@ -59,7 +58,6 @@ mort_comb %>%
     ggplot() +
     geom_line(aes(x = Age, y = value, col = Sex)) +
     facet_wrap(~CNTRY) +
-    theme_bw() +
     scale_y_log10()
 
 
