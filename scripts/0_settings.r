@@ -3,4 +3,6 @@
 # Purpose: This is a settings file that will be tracked by git
 
 
+options(scipen = 999)
+
 # GGplot Settings  --------------
