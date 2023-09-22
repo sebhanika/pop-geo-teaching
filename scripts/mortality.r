@@ -15,11 +15,13 @@ source("scripts/0_config.R")
 source("scripts/0_settings.R")
 
 
+# Load data --------------
 
-
+# Specify countries of interest
 mort_countries <- c("SWE", "USA", "JPN", "AUS", "POL", "ESP")
 mort <- list()
 
+# download data
 for (i in seq_along(mort_countries)) {
     mort[[i]] <- readHMDweb(
         CNTRY = mort_countries[i],
@@ -34,19 +36,35 @@ for (i in seq_along(mort_countries)) {
 # combine data
 mort_comb <- do.call(dplyr::bind_rows, mort) %>%
     select(-c(Total)) %>%
-    pivot_longer(cols = c(Female, Male), names_to = "Sex") %>%
+    pivot_longer(
+        cols = c(Female, Male),
+        names_to = "Sex"
+    ) %>%
     mutate(value = ifelse(value == 0, NA, value))
 
 
+# Plots --------------
 
-
-
+# Plot force of mortality USA
 mort_comb %>%
-    filter(Year == 2019, CNTRY == "POL") %>%
-    ggplot() +
-    geom_line(aes(x = Age, y = value, col = Sex)) +
+    filter(Year == 2019, CNTRY == "USA") %>%
+    ggplot(aes(x = Age, y = value, col = Sex)) +
+    geom_line() +
     scale_y_log10() +
-    theme_base()
+    theme_base() +
+    theme(
+        legend.title = element_blank(),
+        legend.text = element_text(size = 20),
+        legend.position = c(0.92, 0.05),
+        legend.background = element_rect(
+            linetype = "solid",
+            color = "black"
+        )
+    ) +
+    labs(
+        x = "Age",
+        y = "Death rates (log)", title = "Death rates USA in 2019"
+    )
 
 
 
@@ -58,7 +76,13 @@ mort_comb %>%
     ggplot() +
     geom_line(aes(x = Age, y = value, col = Sex)) +
     facet_wrap(~CNTRY) +
-    scale_y_log10()
+    scale_y_log10() +
+    theme_base() +
+    theme(
+        legend.title = element_blank(),
+        legend.text = element_text(size = 20),
+        legend.position = "bottom"
+    )
 
 
 
@@ -71,8 +95,21 @@ yrs <- seq(1959, 2019, 20)
 usa <- mort_comb %>%
     filter(Year %in% yrs, CNTRY == "USA") %>%
     ggplot() +
-    geom_line(aes(x = Age, y = value, color = as.factor(Year))) +
-    theme_bw() +
+    geom_line(aes(
+        x = Age, y = value,
+        color = as.factor(Year),
+        linetype = as.factor(Year)
+    )) +
     facet_wrap(~Sex) +
-    scale_y_log10()
+    scale_y_log10() +
+    theme_base() +
+    theme(
+        legend.title = element_blank(),
+        legend.text = element_text(size = 20),
+        legend.position = "bottom"
+    ) +
+    labs(
+        x = "Age",
+        y = "Death rates (log)"
+    )
 usa
