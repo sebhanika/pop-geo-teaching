@@ -2,7 +2,6 @@
 # Date: 2023-10-10
 # Purpose: Script Purpose
 
-
 # /* cSpell:disable */
 
 library(dplyr)
@@ -99,18 +98,20 @@ swe_pop <- readHMDweb(
         cols = c(male, female),
         values_to = "pop", names_to = "sex"
     ) %>%
-    janitor::clean_names()
+    janitor::clean_names() %>%
+    mutate(sex = factor(sex, levels = c("male", "female")))
 
 head(swe_pop)
 
 
 
 
+# Four years --------------
+
 ##### old pyramid code
 
-
 try_lab <- swe_pop %>%
-    filter(year == 2021) %>%
+    filter(year %in% c(1872, 1922, 1972, 2022)) %>%
     ggplot(aes(
         x = age,
         y = ifelse(sex == "male", -pop, pop),
@@ -118,19 +119,19 @@ try_lab <- swe_pop %>%
     )) +
     geom_bar(stat = "identity") +
     scale_y_continuous(
-        limits = c(-2500, 2500),
-        breaks = seq(-2000, 2000, 1000),
-        labels = c(2, 1, 0, 1, 2)
+        limits = c(-83000, 83000),
+        breaks = seq(-80000, 80000, 40000),
+        labels = c(80, 40, 0, 40, 80)
     ) + # manual labeling
     scale_fill_manual(
         values = c("female" = "#01665E", "male" = "#DABF7F"),
-        labels = c("Female", "Male"),
+        labels = c("Male", "Female"),
         name = "Sex"
     ) +
     coord_flip() +
     labs(
         x = "Age",
-        y = "Population in million"
+        y = "Population in Thousand"
     ) +
     theme_bw() +
     theme(
@@ -139,39 +140,16 @@ try_lab <- swe_pop %>%
         panel.grid.minor = element_blank(),
         panel.background = element_blank(),
         axis.line = element_line(colour = "black"),
-        axis.title = element_text(size = 10, color = "grey20")
+        axis.title = element_text(size = 10, color = "grey20"),
+        strip.text.x = element_text(size = 15)
     ) +
-    theme(strip.text.x = element_text(size = 15))
+    facet_wrap(~year)
 try_lab
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### plotting data
+# GGanimate --------------
 
 plot_pyr <- swe_pop %>%
     filter(year %in% 1850:2022) %>%
@@ -181,15 +159,20 @@ plot_pyr <- swe_pop %>%
         pop, fill = sex
     )) +
     geom_bar(stat = "identity") +
+    scale_y_continuous(
+        limits = c(-83000, 83000),
+        breaks = seq(-80000, 80000, 40000),
+        labels = c(80, 40, 0, 40, 80)
+    ) + # manual labeling
     scale_fill_manual(
         values = c("female" = "#01665E", "male" = "#DABF7F"),
-        labels = c("Female", "Male"),
+        labels = c("Male", "Female"),
         name = "Sex"
     ) +
     coord_flip() +
     labs(
         x = "Age",
-        y = "Population in million"
+        y = "Population in Thousand"
     ) +
     theme_bw() +
     theme(
@@ -204,16 +187,13 @@ plot_pyr <- swe_pop %>%
 
 plot_pyr
 
-
-
 gif <- plot_pyr +
     transition_time(year) +
     labs(title = "Year: {frame_time}")
 
-animate(gif,
-    fps = 8,
+
+anim_save("try2.gif", gif,
+    fps = 7,
     renderer = gifski_renderer(loop = TRUE),
     height = 32, width = 18, units = "cm", res = 150
 )
-
-anim_save("try2.gif", gif)
