@@ -9,7 +9,6 @@ library(dplyr)
 library(ggplot2)
 library(tidyr)
 library(HMDHFDplus)
-library(ggthemes)
 library(gganimate)
 
 source("scripts/0_config.R")
