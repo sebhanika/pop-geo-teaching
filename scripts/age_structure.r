@@ -9,80 +9,15 @@ library(ggplot2)
 library(tidyr)
 library(HMDHFDplus)
 library(gganimate)
+library(nationalparkcolors)
 
 source("scripts/0_config.R")
 source("scripts/0_settings.R")
 
-# load data --------------
-
-
-# death rate
-swe_deaths <- readHMDweb(
-    CNTRY = "SWE",
-    "Deaths_1x1",
-    username = hmd_username,
-    password = hmd_password,
-    fixup = TRUE
-) %>%
-    select(-c(Female, Male)) %>%
-    rename(deaths = Total) %>%
-    group_by(Year) %>%
-    summarise(across(
-        .cols = c(deaths),
-        .fns = ~ sum(.x, na.rm = TRUE)
-    )) %>%
-    ungroup()
-
-
-
-swe_pop <- readHMDweb(
-    CNTRY = "SWE",
-    "Population",
-    username = hmd_username,
-    password = hmd_password,
-    fixup = TRUE
-) %>%
-    select(c(Year, Age, Total2)) %>%
-    rename(pop = Total2) %>%
-    group_by(Year) %>%
-    summarise(across(
-        .cols = c(pop),
-        .fns = ~ sum(.x, na.rm = TRUE)
-    )) %>%
-    ungroup()
-
-
-# crude birth rate
-swe_births <- readHMDweb(
-    CNTRY = "SWE",
-    "Births",
-    username = hfd_username,
-    password = hfd_password,
-    fixup = TRUE
-) %>%
-    select(-c(Female, Male)) %>%
-    rename(births = Total)
-
-
-swe_dat <- swe_deaths %>%
-    left_join(swe_births, by = c("Year")) %>%
-    left_join(swe_pop, by = c("Year")) %>%
-    mutate(
-        cbr = births / (pop / 1000),
-        cdr = deaths / (pop / 1000)
-    )
-
-
-plot(swe_dat$Year, swe_dat$cdr, type = "l")
-lines(swe_dat$Year, swe_dat$cbr, lty = 2)
-
-
-
-
 
 # Age pyramid data  --------------
 
-swe_pop <- readHMDweb(
+swe_pop_pyr <- readHMDweb(
     CNTRY = "SWE",
     "Population",
     username = hmd_username,
@@ -101,58 +36,69 @@ swe_pop <- readHMDweb(
     janitor::clean_names() %>%
     mutate(sex = factor(sex, levels = c("male", "female")))
 
-head(swe_pop)
 
-
-
-
-# Four years --------------
+# Static graph/four years --------------
 
 ##### old pyramid code
 
-try_lab <- swe_pop %>%
-    filter(year %in% c(1872, 1922, 1972, 2022)) %>%
+# Settings for labeling and filter for plot
+years_p <- c(1872, 1922, 1972, 2022)
+max_pop <- max(swe_pop_pyr$pop)
+
+# get first two digits of rounded max pop. expressed in thousands
+max_pop_lim <- round(max_pop, -4)
+max_pop_label <- as.numeric(substr(max_pop_lim, 1, 2))
+
+# get breaks for axis, needs negative values
+pop_brks <- seq(-max_pop_lim, max_pop_lim, max_pop_lim / 2)
+# get nice labels
+pop_labels <- abs(seq(-max_pop_label, max_pop_label, max_pop_label / 2))
+
+
+# age pyramid plot
+age_pyrs <- swe_pop_pyr %>%
+    filter(year %in% years_p) %>%
     ggplot(aes(
         x = age,
         y = ifelse(sex == "male", -pop, pop),
-        pop, fill = sex
+        fill = sex
     )) +
     geom_bar(stat = "identity") +
     scale_y_continuous(
-        limits = c(-83000, 83000),
-        breaks = seq(-80000, 80000, 40000),
-        labels = c(80, 40, 0, 40, 80)
-    ) + # manual labeling
+        limits = c(-max(swe_pop_pyr$pop), max(swe_pop_pyr$pop)),
+        breaks = pop_brks,
+        labels = pop_labels
+    ) +
     scale_fill_manual(
-        values = c("female" = "#01665E", "male" = "#DABF7F"),
-        labels = c("Male", "Female"),
-        name = "Sex"
+        values = park_palette("ArcticGates", 2),
+        labels = c("Male", "Female")
     ) +
     coord_flip() +
     labs(
         x = "Age",
-        y = "Population in Thousand"
+        y = "Population in Thousand",
+        caption = "Source: Human Mortality Database"
     ) +
-    theme_bw() +
+    facet_wrap(~year) +
     theme(
-        plot.title = element_text(hjust = 0.5, size = 12),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        panel.background = element_blank(),
-        axis.line = element_line(colour = "black"),
-        axis.title = element_text(size = 10, color = "grey20"),
-        strip.text.x = element_text(size = 15)
-    ) +
-    facet_wrap(~year)
-try_lab
+        legend.position = "bottom",
+        legend.title = element_blank()
+    )
+age_pyrs
 
-
+# save plot
+ggsave(
+    filename = "graphs/age_pyr_swe.png",
+    plot = age_pyrs,
+    width = 25, height = 25, units = "cm"
+)
 
 
 # GGanimate --------------
 
-plot_pyr <- swe_pop %>%
-    filter(year %in% 1850:2022) %>%
+# create plot for animation
+pyr_anim <- swe_pop_pyr %>%
+    filter(year %in% 1872:2022) %>%
     ggplot(aes(
         x = age,
         y = ifelse(sex == "male", -pop, pop),
@@ -160,40 +106,33 @@ plot_pyr <- swe_pop %>%
     )) +
     geom_bar(stat = "identity") +
     scale_y_continuous(
-        limits = c(-83000, 83000),
-        breaks = seq(-80000, 80000, 40000),
-        labels = c(80, 40, 0, 40, 80)
-    ) + # manual labeling
+        limits = c(-max(swe_pop_pyr$pop), max(swe_pop_pyr$pop)),
+        breaks = pop_brks,
+        labels = pop_labels
+    ) +
     scale_fill_manual(
-        values = c("female" = "#01665E", "male" = "#DABF7F"),
-        labels = c("Male", "Female"),
-        name = "Sex"
+        values = c("#cfb470", "#678096"),
+        labels = c("Male", "Female")
     ) +
     coord_flip() +
     labs(
         x = "Age",
-        y = "Population in Thousand"
+        y = "Population in Thousand",
+        caption = "Source: Human Mortality Database"
     ) +
-    theme_bw() +
     theme(
-        plot.title = element_text(hjust = 0.5, size = 12),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        panel.background = element_blank(),
-        axis.line = element_line(colour = "black"),
-        axis.title = element_text(size = 10, color = "grey20")
-    ) +
-    theme(strip.text.x = element_text(size = 15))
+        legend.position = "bottom",
+        legend.title = element_blank()
+    )
 
-plot_pyr
 
-gif <- plot_pyr +
+# create animation
+age_pyr_gif <- pyr_anim +
     transition_time(year) +
     labs(title = "Year: {frame_time}")
 
-
-anim_save("try2.gif", gif,
+anim_save("graphs/age_pyr_animated.gif", age_pyr_gif,
     fps = 7,
     renderer = gifski_renderer(loop = TRUE),
-    height = 32, width = 18, units = "cm", res = 150
+    height = 18, width = 32, units = "cm", res = 150
 )
