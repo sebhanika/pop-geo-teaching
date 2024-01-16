@@ -32,21 +32,31 @@ deaths <-
     mutate(value = ifelse(value == 0, NA, value))
 
 
-deaths %>%
-    filter(Year == 2019) %>%
-    ggplot(aes(x = Age, y = value, col = Sex)) +
-    geom_line() +
-    theme_base() +
+plot_deaths <- deaths %>%
+    filter(Year == 2022) %>%
+    ggplot(aes(x = Age, y = value, col = Sex, linetype = Sex)) +
+    geom_line(linewidth = 1.1, alpha = 0.75) +
+    scale_color_manual(values = (c("#9C6114", "#000080"))) +
+    scale_linetype_manual(values = (c(1, 3))) +
     theme(
-        legend.title = element_blank(),
-        legend.text = element_text(size = 20),
-        legend.position = c(0.92, 0.05),
+        legend.position = c(0.094, 0.91),
         legend.background = element_rect(
             linetype = "solid",
             color = "black"
-        )
+        ),
+        legend.key.width = unit(2, "cm"),
     ) +
     labs(
         x = "Age",
-        y = "Death rates", title = "Death rates Sweden in 2019"
+        y = "Deaths",
+        title = "Number of deaths in Sweden in 2019",
+        caption = "Source: Human Mortality Database (2023)"
     )
+
+plot_deaths
+
+
+ggsave(
+    filename = "viszs/deaths.png",
+    plot = plot_deaths, width = 32, height = 18, units = "cm"
+)
