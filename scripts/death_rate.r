@@ -20,7 +20,7 @@ source("scripts/0_settings.R")
 mort_countries <- c("SWE", "USA", "JPN", "ESP")
 
 
-# create labels
+# create labels if
 cntry_labels <- setNames(
     countrycode(mort_countries,
         origin = "iso3c",
@@ -53,8 +53,7 @@ mort_comb <- do.call(dplyr::bind_rows, mort) %>%
 
 # Plots --------------
 
-# Plot force of mortality SWE
-
+# Plot death rates Sweden
 swe_plot <- mort_comb %>%
     filter(Year == 2019, CNTRY == "SWE") %>%
     ggplot(aes(x = Age, y = value, col = Sex, linetype = Sex)) +
@@ -79,17 +78,13 @@ swe_plot <- mort_comb %>%
 
 swe_plot
 
-
 ggsave(
     filename = "viszs/asdr.png",
     plot = swe_plot, width = 32, height = 18, units = "cm"
 )
 
 
-
-
-# Country comparison --------------
-
+# Plots Sweden-USA --------------
 asdr_cntr_f <- mort_comb %>%
     filter(Year == 2019, Sex == "Female", CNTRY %in% c("SWE", "USA")) %>%
     ggplot(aes(x = Age, y = value, linetype = CNTRY, color = CNTRY)) +
@@ -124,96 +119,3 @@ ggsave(
     filename = "viszs/asdr_cntr_F.png",
     plot = asdr_cntr_f, width = 32, height = 18, units = "cm"
 )
-
-
-
-
-# Males
-
-asdr_cntr_m <- mort_comb %>%
-    filter(Year == 2019, Sex == "Male", CNTRY %in% c("SWE", "USA")) %>%
-    ggplot(aes(x = Age, y = value, linetype = CNTRY, color = CNTRY)) +
-    geom_line(linewidth = 1.1, alpha = 0.75) +
-    scale_y_log10() +
-    scale_color_manual(
-        values = (c("#9C6114", "#000080")),
-        labels = cntry_labels
-    ) +
-    scale_linetype_manual(
-        values = (c(1, 3)),
-        labels = cntry_labels
-    ) +
-    theme(
-        legend.position = c(0.13, 0.91),
-        legend.background = element_rect(
-            linetype = "solid",
-            color = "black"
-        ),
-        legend.key.width = unit(2, "cm"),
-    ) +
-    labs(
-        x = "Age",
-        y = "Age-specfic death rates (log)",
-        title = "Age-specfic death rates for females in 2019",
-        caption = "Source: Human Mortality Database (2023)"
-    )
-
-asdr_cntr_m
-
-ggsave(
-    filename = "viszs/asdr_cntr_m.png",
-    plot = asdr_cntr_m, width = 32, height = 18, units = "cm"
-)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Plot force of mortality USA
-mort_comb %>%
-    filter(Year == 2019, CNTRY == "USA") %>%
-    ggplot(aes(x = Age, y = value, col = Sex)) +
-    geom_line() +
-    scale_y_log10() +
-    theme_base() +
-    theme(
-        legend.title = element_blank(),
-        legend.text = element_text(size = 20),
-        legend.position = c(0.92, 0.05),
-        legend.background = element_rect(
-            linetype = "solid",
-            color = "black"
-        )
-    ) +
-    labs(
-        x = "Age",
-        y = "Death rates (log)", title = "Death rates USA in 2019"
-    )
-
-
-
-# mid age mortality hump across different countries
-
-mort_comb %>%
-    filter(Year == 2019) %>%
-    ggplot() +
-    geom_line(aes(x = Age, y = value, col = Sex)) +
-    facet_wrap(~CNTRY, labeller = as_labeller(cntry_labels)) +
-    scale_y_log10() +
-    theme_base() +
-    theme(
-        legend.title = element_blank(),
-        legend.text = element_text(size = 20),
-        legend.position = "bottom"
-    )
