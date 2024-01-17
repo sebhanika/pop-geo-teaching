@@ -49,7 +49,7 @@ plot_deaths <- deaths %>%
     labs(
         x = "Age",
         y = "Deaths",
-        title = "Number of deaths in Sweden in 2019",
+        title = "Number of deaths in Sweden in 2022",
         caption = "Source: Human Mortality Database (2023)"
     )
 
