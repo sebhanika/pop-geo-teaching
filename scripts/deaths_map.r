@@ -9,14 +9,14 @@ library(tidyr)
 library(HMDHFDplus)
 library(ggthemes)
 library(countrycode)
-library(nationalparkcolors)
 library(eurostat)
+library(sf)
 library(ggspatial)
 
 source("scripts/0_config.R")
 source("scripts/0_settings.R")
 
-
+# Load data --------------
 nuts2_v1 <-
     get_eurostat_geospatial(
         output_class = "sf",
@@ -41,19 +41,27 @@ nuts2_v1 <-
     select(c(cntr_code, name_latn, geo, geometry, region, country)) %>%
     rename(nuts2_name = name_latn) %>%
     relocate(cntr_code, .before = region) %>%
-    relocate(country, .before = cntr_code)
+    relocate(country, .before = cntr_code) %>%
+    st_transform(3035)
 
-
-deaths_raw <- get_eurostat("demo_r_magec", time_format = "num")
 
 pop <- get_eurostat("demo_r_d2jan", time_format = "num") %>%
-    filter(TIME_PERIOD == 2019, nchar(geo) == 4, age == "TOTAL", sex == "T") %>%
+    filter(
+        TIME_PERIOD == 2019,
+        nchar(geo) == 4,
+        age == "TOTAL",
+        sex == "T"
+    ) %>%
     mutate(sex = ifelse(sex == "T", "pop", "no")) %>%
     pivot_wider(names_from = sex, values_from = values) %>%
     select(c(geo, pop))
 
-deaths <- deaths_raw %>%
-    filter(TIME_PERIOD == 2019, nchar(geo) == 4, age == "TOTAL") %>%
+deaths <- get_eurostat("demo_r_magec", time_format = "num") %>%
+    filter(
+        TIME_PERIOD == 2019,
+        nchar(geo) == 4,
+        age == "TOTAL"
+    ) %>%
     pivot_wider(names_from = sex, values_from = values) %>%
     select(-c(freq, unit, age, TIME_PERIOD))
 
@@ -61,21 +69,10 @@ deaths <- deaths_raw %>%
 dat_comb <- nuts2_v1 %>%
     left_join(deaths) %>%
     left_join(pop) %>%
-    filter(pop > 0) %>%
-    mutate(
-        cdr_f = F / pop * 1000,
-        cdr_m = M / pop * 1000,
-        cdr_t = T / pop * 1000
-    )
+    mutate(cdr_t = T / pop * 1000)
 
 
-dat_comb %>% ggplot() +
-    geom_sf(aes(fill = cdr_f))
-
-
-
-
-##### OLD CODE
+# Create Map --------------
 
 # creating custom color palette
 self_palette <- c("#eff3ff", "#bdd7e7", "#6baed6", "#3182bd", "#08519c")
@@ -105,12 +102,12 @@ p_cdr_map <- cdr_map %>%
     geom_sf(aes(fill = as.factor(val_int)),
         linewidth = 0.1, alpha = 1
     ) +
-    # coord_sf(xlim = xlim, ylim = ylim, expand = FALSE) +
-    scale_fill_manual("CDR (2020)",
+    coord_sf(xlim = xlim, ylim = ylim, expand = FALSE) +
+    scale_fill_manual("CDR (2019)",
         values = self_palette,
         na.value = "#a7a7a7"
     ) +
-    labs(caption = "Source: Eurostat") +
+    labs(caption = "Source: Eurostat (2023)") +
     theme_base() +
     theme(
         axis.text = element_blank(),
@@ -123,5 +120,7 @@ p_cdr_map <- cdr_map %>%
 p_cdr_map
 
 
-head(x)
-unique(x$sex)
+ggsave(
+    filename = "viszs/cdr_maps_NUTS2.png",
+    plot = p_cdr_map, width = 25, height = 25, units = "cm"
+)
