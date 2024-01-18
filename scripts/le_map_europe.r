@@ -63,8 +63,7 @@ xlim <- c(2426378.0132, 6593974.6215)
 ylim <- c(1328101.2618, 5446513.5222)
 
 # create bins for chrolopeth map
-
-data_bins <- c(69.2, 75, 80, 81, 82, 83, 84.9)
+data_bins <- c(69.2, 75, 80, 81, 82, 83, 85.7)
 
 le_map <- dat_comb %>%
     mutate(val_int = cut(le_T,
