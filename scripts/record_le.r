@@ -43,15 +43,26 @@ le_comb <- do.call(dplyr::bind_rows, le)
 # filters for max value in each year
 # however in 1861 there are two max values (DKK, SWE)
 le_max <- le_comb %>%
+    filter(CNTRY != "BLR") %>% # exlcude Belarus (data quality issues)
     group_by(Year) %>%
     filter(Female == max(Female, na.rm = TRUE)) %>%
     ungroup() %>%
     arrange(Year) %>%
     distinct(Year, Female, .keep_all = TRUE) %>%
-    filter(Year %in% c(1840:2021))
+    filter(Year %in% c(1840:2021)) %>%
+    mutate(country_name = case_when(
+        CNTRY == "SWE" ~ "Sweden",
+        CNTRY == "ISL" ~ "Iceland",
+        CNTRY == "DNK" ~ "Denmark",
+        CNTRY == "NOR" ~ "Norway",
+        CNTRY == "NZL_NM" ~ "New Zealand (non-Maori)",
+        CNTRY == "JPN" ~ "Japan",
+        CNTRY == "HKG" ~ "Hongkong",
+        TRUE ~ CNTRY
+    ))
 
 # create a numerrical factor for plotting
-max_cntrs <- (unique(le_max$CNTRY))
+max_cntrs <- (unique(le_max$country_name))
 country_numbers <- as.integer(factor(max_cntrs))
 le_max$cntry_fac <- factor(le_max$CNTRY,
     levels = unique(le_max$CNTRY), labels = country_numbers
@@ -61,17 +72,17 @@ le_max$cntry_fac <- factor(le_max$CNTRY,
 # create plot and export
 png(
     filename = "viszs/record_le.png",
-    width = 32, height = 18, units = "cm",
+    width = 25, height = 20, units = "cm",
     res = 300
 )
+
 plot(
     x = le_max$Year,
     y = le_max$Female,
     pch = as.integer(le_max$cntry_fac),
     col = as.integer(le_max$cntry_fac),
     xlab = "Year",
-    ylab = "Life Expecantcy at birth in years",
-    main = "Record Female Life Expectancy"
+    ylab = "Period Life Expecantcy at birth in years"
 )
 
 legend(
@@ -82,4 +93,10 @@ legend(
     col = factor(levels(factor(le_max$CNTRY))),
     cex = 1.5
 )
+
+title("Record Female Life Expectancy", adj = 0, line = 0.3)
+mtext("Source: Human Mortality Database (2023)\nafter Oeppen and Vaupel (2002)",
+    side = 1, adj = 1, line = 3.5
+)
+
 dev.off()
