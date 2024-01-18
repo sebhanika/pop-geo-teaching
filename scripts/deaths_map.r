@@ -28,20 +28,8 @@ nuts2_v1 <-
     ) %>%
     janitor::clean_names() %>%
     filter(!grepl("^FRY|^FR$", nuts_id)) %>% # rm colonies
-    mutate(region = countrycode(
-        sourcevar = cntr_code,
-        origin = "eurostat",
-        destination = "un.regionsub.name"
-    )) %>%
-    mutate(country = countrycode(
-        sourcevar = cntr_code,
-        origin = "eurostat",
-        destination = "country.name"
-    )) %>%
-    select(c(cntr_code, name_latn, geo, geometry, region, country)) %>%
+    select(c(cntr_code, name_latn, geo, geometry)) %>%
     rename(nuts2_name = name_latn) %>%
-    relocate(cntr_code, .before = region) %>%
-    relocate(country, .before = cntr_code) %>%
     st_transform(3035)
 
 
