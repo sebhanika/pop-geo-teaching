@@ -84,7 +84,7 @@ p_le_map <- le_map %>%
         linewidth = 0.1, alpha = 1
     ) +
     coord_sf(xlim = xlim, ylim = ylim, expand = FALSE) +
-    scale_fill_manual("Life Expectancy (2019)",
+    scale_fill_manual("Life Expectancy (201)",
         values = self_palette,
         na.value = "#a7a7a7"
     ) +
