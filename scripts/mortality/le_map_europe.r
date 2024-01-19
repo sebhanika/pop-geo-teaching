@@ -71,7 +71,7 @@ le_map <- dat_comb %>%
         labels = c(
             "< 75", "75 - < 80",
             "80 - < 81", "81 - < 82",
-            "82 - < 83", "> 83"
+            "82 - < 83", " ≥ 83"
         ),
         include.lowest = TRUE,
         right = FALSE
@@ -84,16 +84,15 @@ p_le_map <- le_map %>%
         linewidth = 0.1, alpha = 1
     ) +
     coord_sf(xlim = xlim, ylim = ylim, expand = FALSE) +
-    scale_fill_manual("Life Expectancy (201)",
+    scale_fill_manual("Life Expectancy (2019)",
         values = self_palette,
         na.value = "#a7a7a7"
     ) +
     labs(caption = "Source: Eurostat (2023)") +
-    theme_base() +
     theme(
         axis.text = element_blank(),
         axis.ticks = element_blank(),
-        legend.position = c(0.88, 0.88)
+        legend.position = c(0.86, 0.86)
     ) +
     annotation_scale(height = unit(0.15, "cm"))
 
