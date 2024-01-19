@@ -67,7 +67,7 @@ swe_plot <- mort_comb %>%
             linetype = "solid",
             color = "black"
         ),
-        legend.key.width = unit(2, "cm"),
+        legend.key.width = unit(2, "cm")
     ) +
     labs(
         x = "Age",
