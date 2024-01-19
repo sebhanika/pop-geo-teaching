@@ -71,9 +71,8 @@ le_plot <- le_comb %>%
         x = "", y = "Female Period Life Expectancy in Years",
         caption = "Source: Human Mortality Database (2023)"
     ) +
-    theme_base() +
     theme(
-        legend.position = c(0.082, 0.86),
+        legend.position = c(0.9, 0.15),
         legend.background = element_rect(
             linetype = "solid",
             color = "black"
