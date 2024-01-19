@@ -94,7 +94,6 @@ p_cdr_map <- cdr_map %>%
         na.value = "#a7a7a7"
     ) +
     labs(caption = "Source: Eurostat (2023)") +
-    theme_base() +
     theme(
         axis.text = element_blank(),
         axis.ticks = element_blank(),
