@@ -131,6 +131,7 @@ for (i in yrs) {
             na.value = "#a7a7a7", drop = FALSE
         ) +
         labs(
+            title = paste0("Female Life Expectancy in: ", i),
             caption = "Source: World Bank (2023)"
         ) +
         theme(
@@ -159,7 +160,7 @@ invisible(
                 plot = map_list[[x]],
                 bg = "white",
                 width = 32,
-                height = 28,
+                height = 18,
                 unit = "cm"
             )
         }
@@ -169,10 +170,18 @@ invisible(
 
 png_files <- list.files("viszs/le_map/", pattern = ".*png$", full.names = TRUE)
 gifski(png_files,
-    gif_file = "viszs/le_world_map.gif", width = 1050, height = 600, delay = 0.25
+    gif_file = "viszs/le_world_map.gif",
+    width = 1209, height = 680, delay = 0.25
 )
 
 
+
+
+
+
+
+
+# Old code with bug  --------------
 
 
 # Plot Map GIF
