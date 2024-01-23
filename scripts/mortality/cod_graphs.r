@@ -10,6 +10,7 @@ library(tidyr)
 library(ggplot2)
 library(dplyr)
 library(nationalparkcolors)
+library(gganimate)
 
 source("scripts/0_config.R")
 source("scripts/0_settings.R")
@@ -35,52 +36,47 @@ categs_cod <- function(x) {
     )
 }
 
-
-cpal <- c(
-    "Cancer" = "#FF6059",
-    "Circulatory Diseases" = "#E3B135",
-    "Mental Diseases" = "#79C8CC",
-    "Diseases of the Nervous System" = "#FF93F2",
-    "Cerebrovascular Diseases" = "#FF8500",
-    "Resperatory Diseases" = "#59C580",
-    "Perinatal & Congenital Conditions" = "#799BCC",
-    "Other" = "#9A9A9A"
+# corresponding pallete
+cod_palette <- c(
+    "Cancer" = "#a6cee3",
+    "Circulatory Diseases" = "#176294",
+    "Mental Diseases" = "#b2df8a",
+    "Diseases of the Nervous System" = "#33a02c",
+    "Cerebrovascular Diseases" = "#fb9a99",
+    "Resperatory Diseases" = "#942527",
+    "Perinatal & Congenital Conditions" = "#fdbf6f",
+    "Other" = "#acacac"
 )
 
-
-
+# Factor order
+cod_order <- c(
+    "Cancer", "Cerebrovascular Diseases", "Circulatory Diseases",
+    "Diseases of the Nervous System", "Mental Diseases",
+    "Perinatal & Congenital Conditions", "Resperatory Diseases", "Other"
+)
 
 
 # Load data --------------
 
-x <- read.csv(file = "data_download/DEUTNP_m_short_idr.csv")
+# Sourced from the Human CoD database
 
-y <- read.csv(file = "data_download/DEUTNP_d_short_idr.csv")
-
-y_try <- y %>%
-    filter(cause != 0, sex != 3) %>%
+cod_ger <- read.csv(file = "data_download/DEUTNP_d_short_idr.csv") %>%
+    filter(
+        year == 2016,
+        cause != 0, # rm all cause
+        sex != 3 # rm total sex
+    ) %>%
     select(-c(d95, d85p, d90p, d100p, list, agf)) %>%
     pivot_longer(cols = starts_with("d"), names_to = "age") %>%
     mutate(
+        # age categ to numeric, last open interval
         age = as.numeric(gsub("[^0-9.]", "", age)),
-        open_int = ifelse(age == 95, TRUE, FALSE)
+        sex = as.factor(sex),
+        # recode CoD
+        cause_categ = categs_cod(cause),
+        cause_categ = factor(cause_categ, levels = cod_order)
     ) %>%
-    mutate(cause_categ = categs_cod(cause)) %>%
-    group_by(cause_categ, age, sex, year) %>%
-    summarise(value = sum(value, na.rm = TRUE)) %>%
-    ungroup() %>%
-    mutate(sex = as.factor(sex))
-
-x_try <- x %>%
-    filter(cause != 0, sex != 3) %>%
-    select(-c(m95, m85p, m90p, m100p, list, agf)) %>%
-    pivot_longer(cols = starts_with("m"), names_to = "age") %>%
-    mutate(
-        age = as.numeric(gsub("[^0-9.]", "", age)),
-        open_int = ifelse(age == 95, TRUE, FALSE)
-    ) %>%
-    mutate(cause_categ = categs_cod(cause)) %>%
-    group_by(cause_categ, age, sex, year) %>%
+    group_by(cause_categ, age, sex) %>%
     summarise(value = sum(value, na.rm = TRUE)) %>%
     ungroup()
 
@@ -88,65 +84,57 @@ x_try <- x %>%
 
 
 
-x_try %>%
-    filter(year == 1998) %>%
-    ggplot(aes(x = (age), y = value, fill = as.factor(cause_categ))) +
-    geom_area() +
-    scale_y_log10() +
-    facet_wrap(~sex)
+# Axis labelling for CoD "pyramid"
+max_death_age <- cod_ger %>%
+    group_by(age, sex) %>%
+    summarise(value = sum(value, na.rm = TRUE))
 
+max_death <- max(max_death_age$value)
 
-
-
-y_try %>%
-    filter(year == 2016) %>%
-    ggplot(aes(x = age, y = value, fill = cause_categ)) +
-    geom_area() +
-    facet_wrap(~sex)
-
-?geom_density
-
-
-
-max_pop <- max(y_try$value)
-
-# get first two digits of rounded max pop. expressed in thousands
-max_pop_lim <- round(max_pop, -4)
-max_pop_label <- as.numeric(substr(max_pop_lim, 1, 2))
-
+# get first two digits of rounded max death. expressed in thousands
+max_death_lim <- round(max_death, -4)
+max_death_label <- as.numeric(substr(max_death_lim, 1, 3))
 # get breaks for axis, needs negative values
-pop_brks <- seq(-max_pop_lim, max_pop_lim, max_pop_lim / 2)
+death_brks <- seq(-max_death_lim, max_death_lim, max_death_lim / 2)
 # get nice labels
-pop_labels <- abs(seq(-max_pop_label, max_pop_label, max_pop_label / 2))
+death_labels <- abs(seq(-max_death_label, max_death_label, max_death_label / 2))
 
 
 
-# age pyramid plot
-age_pyrs <- y_try %>%
-    filter(year == 1998) %>%
+# Cod Pyramid plot
+cod_pyr <- cod_ger %>%
     ggplot(aes(
-        x = age,
+        x = as.factor(age),
         y = ifelse(sex == 1, -value, value),
         fill = cause_categ
     )) +
-    geom_bar(stat = "identity", width = 3) +
+    geom_bar(stat = "identity", width = 0.8, alpha = 0.8) +
     geom_hline(yintercept = 0, colour = "#1a0a0a") +
     scale_y_continuous(
-        limits = c(-max(y_try$value), max(y_try$value)),
-        breaks = pop_brks,
-        labels = pop_labels
+        limits = c(-max_death, max_death),
+        breaks = death_brks,
+        labels = death_labels
     ) +
-    scale_fill_manual("Cause of Death", values = cpal) +
+    scale_fill_manual("Cause of Death", values = cod_palette) +
     coord_flip() +
     labs(
         x = "Age",
         y = "Deaths in Thousand",
-        caption = "Source: Human CoD Database"
+        caption = "Source: Human CoD Database (2023)",
+        title = "Causes of Death in Germany in 2016"
     ) +
     theme(
-        legend.position = "bottom",
-        legend.title = element_blank()
+        legend.position = c(0.83, 0.3),
+        legend.background = element_rect(
+            linetype = "solid",
+            color = "black"
+        ),
     ) +
-    guides(fill = guide_legend(nrow = 4, byrow = TRUE))
+    annotate("text", x = 1, y = -max_death / 2, label = "Male", size = 7) +
+    annotate("text", x = 1, y = max_death / 2, label = "Female", size = 7)
+cod_pyr
 
-age_pyrs
+ggsave(
+    filename = "viszs/cod_pyr.png",
+    plot = cod_pyr, width = 40, height = 20, units = "cm"
+)
