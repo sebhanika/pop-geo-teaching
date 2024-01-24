@@ -16,13 +16,10 @@ source("scripts/0_settings.R")
 
 # Load data --------------
 
-
-
 # Specify countries of interest
 birth_countries <- c("SWE", "PRT", "JPN", "USA")
 
-
-# create labels if
+# create labels
 cntry_labels <- setNames(
     countrycode(birth_countries,
         origin = "iso3c",
@@ -46,10 +43,6 @@ for (i in seq_along(birth_countries)) {
 # combine data
 brth_comb <- do.call(dplyr::bind_rows, brth) %>%
     janitor::clean_names()
-
-
-
-
 
 plot_mab <- brth_comb %>%
     ggplot(aes(
