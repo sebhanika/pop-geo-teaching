@@ -98,6 +98,7 @@ ggsave(
 # Animated graph --------------
 
 plot_anim <- dat_comb %>%
+    mutate(date = as.integer(date)) %>%
     ggplot(aes(x = gdp_cap, y = le_female, color = region, size = pop)) +
     geom_point(alpha = 0.7) +
     scale_color_manual("Region",
@@ -120,8 +121,6 @@ plot_anim <- dat_comb %>%
         alpha = "none",
     )
 
-
-
 gif_le_econ <- plot_anim +
     transition_time(date) +
     labs(title = "Year: {frame_time}") +
@@ -133,5 +132,5 @@ gif_le_econ <- plot_anim +
 anim_save("viszs/le_econ.gif", gif_le_econ,
     fps = 7,
     renderer = gifski_renderer(loop = TRUE),
-    height = 18, width = 32, units = "cm", res = 150
+    width = 42, height = 24, units = "cm", res = 300
 )
