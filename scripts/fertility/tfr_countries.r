@@ -18,7 +18,7 @@ source("scripts/0_settings.R")
 # TFR --------------
 
 # Specify countries of interest
-tfr_countries <- c("SWE", "POL", "PRT", "CAN", "BGR", "DNK")
+tfr_countries <- c("SWE", "PRT", "CAN", "BGR")
 
 
 # create labels
@@ -43,12 +43,9 @@ for (i in seq_along(tfr_countries)) {
     tfr[[i]]$CNTRY <- tfr_countries[i]
 }
 
-
-
 # combine data
 tfr_comb <- do.call(dplyr::bind_rows, tfr) %>%
     janitor::clean_names()
-
 
 # create plot
 tfr_plot <- tfr_comb %>%
@@ -64,42 +61,37 @@ tfr_plot <- tfr_comb %>%
         breaks = seq(1900, 2020, 20)
     ) +
     scale_color_manual(
-        values = park_palette("ArcticGates", length(tfr_countries)),
+        values = park_palette("CraterLake"),
         labels = cntry_labels
     ) +
     scale_linetype_manual(
-        values = c(1, 2, 3, 4, 6),
+        values = c(1, 2, 3, 4, 5, 6),
         labels = cntry_labels
     ) +
     labs(
         x = "", y = "Total Fertility Rate",
-        caption = "Source: Human Fertility Database"
+        caption = "Source: Human Fertility Database (2023)"
     ) +
     annotate("text",
         x = 1907.5, y = 2.15,
         label = "Replacement-level fertility"
     ) +
-    theme_base() +
     theme(
-        legend.position = "bottom",
+        legend.position = c(0.09, 0.13),
+        legend.text = element_text(size = 16),
+        legend.background = element_rect(
+            linetype = "solid",
+            color = "black"
+        ),
         legend.title = element_blank(),
         legend.key.width = unit(1.5, "cm")
     )
 tfr_plot
 
 
-
-
-# save plot text
-ggsave(
-    filename = "graphs/tfr_text.png",
-    plot = tfr_plot,
-    width = 25, height = 25, units = "cm"
-)
-
 # save plot presentation
 ggsave(
-    filename = "graphs/tfr_pres.png",
+    filename = "viszs/tfr_countries.png",
     plot = tfr_plot,
     width = 32, height = 18, units = "cm"
 )
