@@ -50,7 +50,7 @@ plot_mab <- brth_comb %>%
     )) +
     geom_line(linewidth = 1.2, alpha = 0.85) +
     scale_color_manual(
-        values = park_palette("GeneralGrant", length(birth_countries)),
+        values = park_palette("Saguaro", length(birth_countries)),
         labels = cntry_labels
     ) +
     scale_linetype_manual(
@@ -58,9 +58,9 @@ plot_mab <- brth_comb %>%
         labels = cntry_labels
     ) +
     labs(
-        x = "Age",
-        y = "Mean Age at Birth",
-        title = "Mean age at birth",
+        x = "Age of mother",
+        y = "Mean Age of Women at Birth",
+        title = "Mean Age at Birth in selected Countries",
         caption = "Source: Human Fertility Database (2023)"
     ) +
     theme(
