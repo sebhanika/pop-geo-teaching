@@ -30,8 +30,8 @@ categs_cod <- function(x) {
         x == 9 ~ "Circulatory Diseases",
         x == 10 ~ "Resperatory Diseases",
         x == 11 ~ "Resperatory Diseases",
-        x == 14 ~ "Perinatal & Congenital Conditions",
-        x == 15 ~ "Perinatal & Congenital Conditions",
+        x == 14 ~ "Perinatal, Congenital and Genitourinary Conditions",
+        x == 15 ~ "Perinatal, Congenital and Genitourinary Conditions",
         TRUE ~ "Other"
     )
 }
@@ -44,7 +44,7 @@ cod_palette <- c(
     "Diseases of the Nervous System" = "#33a02c",
     "Cerebrovascular Diseases" = "#fb9a99",
     "Resperatory Diseases" = "#942527",
-    "Perinatal & Congenital Conditions" = "#fdbf6f",
+    "Perinatal, Congenital and Genitourinary Conditions" = "#fdbf6f",
     "Other" = "#acacac"
 )
 
@@ -52,7 +52,8 @@ cod_palette <- c(
 cod_order <- c(
     "Cancer", "Cerebrovascular Diseases", "Circulatory Diseases",
     "Diseases of the Nervous System", "Mental Diseases",
-    "Perinatal & Congenital Conditions", "Resperatory Diseases", "Other"
+    "Perinatal, Congenital and Genitourinary Conditions",
+    "Resperatory Diseases", "Other"
 )
 
 
@@ -79,8 +80,6 @@ cod_ger <- read.csv(file = "data_download/DEUTNP_d_short_idr.csv") %>%
     group_by(cause_categ, age, sex) %>%
     summarise(value = sum(value, na.rm = TRUE)) %>%
     ungroup()
-
-
 
 
 
@@ -124,7 +123,8 @@ cod_pyr <- cod_ger %>%
         title = "Causes of Death in Germany in 2016"
     ) +
     theme(
-        legend.position = c(0.83, 0.3),
+        legend.text = element_text(size = 14),
+        legend.position = c(0.82, 0.3),
         legend.background = element_rect(
             linetype = "solid",
             color = "black"
