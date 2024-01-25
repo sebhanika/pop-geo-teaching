@@ -47,13 +47,33 @@ eval_na <- dat_comb %>%
     )))
 
 
-dat_comb %>%
+tfr_edu <- dat_comb %>%
     filter(date == 2014) %>%
     ggplot(aes(x = prim_edu, y = tfr)) +
     geom_point(aes(color = region), size = 3, alpha = 0.8) +
     geom_smooth(method = "lm", se = FALSE, color = "#5a5a5a") +
-    scale_color_manual("Regions", values = park_palette("CraterLake")) +
+    scale_color_manual(values = park_palette("CraterLake")) +
     labs(
         x = "Total Fertilty Rate",
-        y = "Primary School Enrollment, Female (%)"
+        y = "Primary School Enrollment, Female (%)",
+        title = "Total Fertility Rate and Female Education in 2014",
+        caption = "Source: World Bank (2023)"
+    ) +
+    theme(
+        legend.position = c(0.16, 0.2),
+        legend.text = element_text(size = 16),
+        legend.background = element_rect(
+            linetype = "solid",
+            color = "black"
+        ),
+        legend.title = element_blank()
     )
+tfr_edu
+
+
+# save plot for presentation
+ggsave(
+    filename = "viszs/tfr_edu.png",
+    plot = tfr_edu,
+    width = 32, height = 18, units = "cm"
+)
