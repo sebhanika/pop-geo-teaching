@@ -59,12 +59,12 @@ plot_tfr_sf2 <- tfr_sf2019_2 %>%
     geom_sf(aes(fill = as.factor(val_int)),
         linewidth = 0.1, alpha = 1
     ) +
-    scale_fill_manual("Female Life Expectancy",
+    scale_fill_manual("Total Fertility Rate",
         values = self_palette,
         na.value = "#a7a7a7"
     ) +
     labs(
-        title = "Female Life Expectancy in 2019",
+        title = "Total Fertility Rate in 2019",
         caption = "Source: World Bank (2023)"
     ) +
     theme(
@@ -120,13 +120,13 @@ for (i in yrs) {
         geom_sf(aes(fill = as.factor(val_int)),
             linewidth = 0.1, alpha = 1
         ) +
-        scale_fill_manual("Female Life Expectancy",
+        scale_fill_manual("Total Fertility Rate",
             values = self_palette,
             breaks = data_labs_gif,
             na.value = "#a7a7a7", drop = FALSE
         ) +
         labs(
-            title = paste0("Female Life Expectancy in: ", i),
+            title = paste0("Total Fertility Rate in: ", i),
             caption = "Source: World Bank (2023)"
         ) +
         theme(
