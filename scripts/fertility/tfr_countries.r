@@ -70,7 +70,8 @@ tfr_plot <- tfr_comb %>%
     ) +
     labs(
         x = "", y = "Total Fertility Rate",
-        caption = "Source: Human Fertility Database (2023)"
+        caption = "Source: Human Fertility Database (2023)",
+        title = "Total Fertility Rate in selected countries"
     ) +
     annotate("text",
         x = 1907.5, y = 2.15,
