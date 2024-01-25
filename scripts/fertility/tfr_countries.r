@@ -61,7 +61,7 @@ tfr_plot <- tfr_comb %>%
         breaks = seq(1900, 2020, 20)
     ) +
     scale_color_manual(
-        values = park_palette("CraterLake"),
+        values = park_palette("Saguaro"),
         labels = cntry_labels
     ) +
     scale_linetype_manual(
