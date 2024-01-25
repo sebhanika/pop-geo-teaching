@@ -1,5 +1,5 @@
 # Title: Births
-# Date: 2023-09-22
+# Date: 2024-01-22
 # Purpose: births in sweden
 # /* cSpell:disable */
 
@@ -33,7 +33,7 @@ plot_births <- births %>%
         linetype = as.factor(Year)
     )) +
     geom_line(linewidth = 1.2, alpha = 0.85) +
-    scale_color_manual(values = park_palette("GeneralGrant")) +
+    scale_color_manual(values = park_palette("CraterLake")) +
     labs(
         x = "Age of mother",
         y = "Births",
