@@ -35,7 +35,7 @@ plot_births <- births %>%
     geom_line(linewidth = 1.2, alpha = 0.85) +
     scale_color_manual(values = park_palette("GeneralGrant")) +
     labs(
-        x = "Age",
+        x = "Age of mother",
         y = "Births",
         title = "Number of births in Sweden in selected years",
         caption = "Source: Human Fertility Database (2023)"
