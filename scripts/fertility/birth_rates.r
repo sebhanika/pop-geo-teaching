@@ -19,7 +19,6 @@ source("scripts/0_settings.R")
 # Specify countries of interest
 asfr_countries <- c("SWE", "USA")
 
-
 # create labels
 cntry_labels <- setNames(
     countrycode(asfr_countries,
@@ -46,8 +45,6 @@ for (i in seq_along(asfr_countries)) {
 asfr_comb <- do.call(dplyr::bind_rows, asfr) %>%
     janitor::clean_names()
 
-
-
 # Plots Sweden-USA --------------
 plot_asfr <- asfr_comb %>%
     filter(year == 2019) %>%
@@ -73,11 +70,10 @@ plot_asfr <- asfr_comb %>%
     labs(
         x = "Age",
         y = "Age-specfic fertility rates",
-        title = "Age-specfic death rates for females in 2019",
+        title = "Age-specfic fertility rates for females in 2019",
         caption = "Source: Human Mortality Database (2023)"
     )
 plot_asfr
-
 
 ggsave(
     filename = "viszs/asfr.png",
