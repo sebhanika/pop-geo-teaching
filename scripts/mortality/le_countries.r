@@ -18,7 +18,7 @@ source("scripts/0_settings.R")
 # life expectancy graphs --------------
 
 # Specify countries of interest
-le_countries <- c("SWE", "CAN", "JPN", "DNK", "ESP")
+le_countries <- c("SWE", "JPN", "DNK", "ESP", "NLD")
 
 # create labels
 cntry_labels <- setNames(
@@ -60,7 +60,7 @@ le_plot <- le_comb %>%
         breaks = seq(1900, 2020, 20)
     ) +
     scale_color_manual(
-        values = park_palette("ArcticGates", length(le_countries)),
+        values = park_palette("Saguaro"),
         labels = cntry_labels
     ) +
     scale_linetype_manual(
@@ -72,7 +72,7 @@ le_plot <- le_comb %>%
         caption = "Source: Human Mortality Database (2023)"
     ) +
     theme(
-        legend.position = c(0.9, 0.15),
+        legend.position = c(0.89, 0.15),
         legend.background = element_rect(
             linetype = "solid",
             color = "black"
