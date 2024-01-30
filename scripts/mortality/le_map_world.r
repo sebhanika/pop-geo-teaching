@@ -7,7 +7,8 @@
 library(dplyr)
 library(tidyr)
 library(wbstats)
-library(cshapes)
+library(rnaturalearth)
+library(rnaturalearthdata)
 library(sf)
 library(ggplot2)
 library(countrycode)
@@ -27,16 +28,22 @@ self_palette <- c("#eff3ff", "#bdd7e7", "#6baed6", "#3182bd", "#08519c")
 le_dat <- wb_data("SP.DYN.LE00.FE.IN", start_date = 1960, end_date = 2021) %>%
     rename(le_female = SP.DYN.LE00.FE.IN)
 
-le_world <- cshp(date = as.Date("2019-01-01")) %>%
-    mutate(iso3c = countrycode(gwcode,
-        origin = "gwn",
+map_world <- ne_countries(
+    scale = "medium",
+    type = "countries",
+    returnclass = "sf"
+) %>%
+    mutate(iso3c = countrycode(
+        name,
+        origin = "country.name",
         destination = "iso3c"
-    ))
-
+    )) %>%
+    select(c(iso3c, name, geometry)) %>%
+    filter(name != "Antarctica")
 
 # Map 2019 --------------
 
-le_sf2019 <- le_world %>%
+le_sf2019 <- map_world %>%
     left_join(subset(le_dat, date == "2019"))
 
 data_bins <- BAMMtools::getJenksBreaks(le_sf2019$le_female, k = 6)
@@ -91,7 +98,7 @@ ggsave(
 
 
 # making map frames manually and add them with gfiski
-le_dat_gif <- le_world %>%
+le_dat_gif <- map_world %>%
     left_join(le_dat)
 
 # create bins for chrolopeth map
