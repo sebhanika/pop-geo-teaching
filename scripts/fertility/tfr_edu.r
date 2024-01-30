@@ -54,8 +54,8 @@ tfr_edu <- dat_comb %>%
     geom_smooth(method = "lm", se = FALSE, color = "#5a5a5a") +
     scale_color_manual(values = park_palette("CraterLake")) +
     labs(
-        x = "Total Fertilty Rate",
-        y = "Primary School Enrollment, Female (%)",
+        y = "Total Fertilty Rate",
+        x = "Primary School Enrollment, Female (%)",
         title = "Total Fertility Rate and Female Education in 2014",
         caption = "Source: World Bank (2023)"
     ) +
