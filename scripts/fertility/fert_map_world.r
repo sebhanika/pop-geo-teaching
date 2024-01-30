@@ -7,7 +7,8 @@
 library(dplyr)
 library(tidyr)
 library(wbstats)
-library(cshapes)
+library(rnaturalearth)
+library(rnaturalearthdata)
 library(sf)
 library(ggplot2)
 library(countrycode)
@@ -27,16 +28,22 @@ self_palette <- c("#eff3ff", "#bdd7e7", "#6baed6", "#3182bd", "#08519c")
 tfr_dat <- wb_data("SP.DYN.TFRT.IN", start_date = 1960, end_date = 2021) %>%
     rename(tfr_female = SP.DYN.TFRT.IN)
 
-tfr_world <- cshp(date = as.Date("2019-01-01")) %>%
-    mutate(iso3c = countrycode(gwcode,
-        origin = "gwn",
+map_world <- ne_countries(
+    scale = "medium",
+    type = "countries",
+    returnclass = "sf"
+) %>%
+    mutate(iso3c = countrycode(
+        name,
+        origin = "country.name",
         destination = "iso3c"
-    ))
-
+    )) %>%
+    select(c(iso3c, name, geometry)) %>%
+    filter(name != "Antarctica")
 
 # Map 2019 --------------
 
-tfr_sf2019 <- tfr_world %>%
+tfr_sf2019 <- map_world %>%
     left_join(subset(tfr_dat, date == "2019"))
 
 data_bins <- BAMMtools::getJenksBreaks(tfr_sf2019$tfr_female, k = 6)
@@ -75,7 +82,6 @@ plot_tfr_sf2 <- tfr_sf2019_2 %>%
 
 plot_tfr_sf2
 
-
 ggsave(
     filename = "viszs/tfr_world_map.png",
     plot = plot_tfr_sf2, width = 32, height = 18, units = "cm"
@@ -91,7 +97,7 @@ ggsave(
 
 
 # making map frames manually and add them with gfiski
-tfr_dat_gif <- tfr_world %>%
+tfr_dat_gif <- map_world %>%
     left_join(tfr_dat)
 
 # create bins for chrolopeth map
