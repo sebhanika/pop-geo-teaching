@@ -45,13 +45,7 @@ bng <- 'PROJCS["OSGB36 / British National Grid",
     AXIS["Northing",NORTH],
     AUTHORITY["EPSG","27700"]]'
 
-la_boundries <- geojson_sf("data_download/Local_Authority_Districts_December_2021_UK_BGC_2022_4923559779027843470.geojson", wkt = bng, input = 27700)
-
-
-
-la_boundries %>%
-    ggplot() +
-    geom_sf(aes(fill = "blue"))
+la_boundries <- geojson_sf("data_download/Local_Authority_Districts_December_2021_UK_BGC_2022_4923559779027843470.geojson", wkt = bng, input = 27700) # nolint
 
 
 la_coords <- la_boundries %>%
@@ -73,7 +67,7 @@ dest <- origin %>%
     left_join(la_coords, by = c("inla" = "LAD21CD")) %>%
     rename(dest_x = LONG) %>%
     rename(dest_y = LAT) %>%
-    filter(moves > 35)
+    filter(moves > 250)
 
 
 xquiet <- scale_x_continuous("", breaks = NULL)
@@ -93,6 +87,8 @@ plot_map <-
         colour = "#ffffff"
     ))
 
+plot_map
+
 ggsave(
     filename = "viszs/int_mig_uk.png", plot = plot_map,
     units = "cm", dpi = 600
@@ -102,3 +98,34 @@ ggsave(
 
 
 # Trying out stuff --------------
+
+try1 <- dest %>%
+    select(origin_x, origin_y, dest_x, dest_y) %>%
+    drop_na()
+
+
+st_segment <- function(r) {
+    st_linestring(t(matrix(unlist(r), 2, 2)))
+}
+
+
+try1$geometry <- st_sfc(sapply(1:nrow(try1),
+    function(i) {
+        st_segment(try1[i, ])
+    },
+    simplify = FALSE
+), crs = "27700")
+
+try1 <- st_as_sf(try1)
+
+try1 <- try1 %>% st_set_crs(st_crs(la_boundries))
+
+
+try2 <- try1 %>%
+    left_join(dest) %>%
+    select(c(geometry, moves))
+
+
+ggplot() +
+    geom_sf(data = try2, aes(alpha = moves), col = "#1f1f1f") +
+    scale_alpha_continuous(range = c(0.03, 0.3))
