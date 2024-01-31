@@ -139,7 +139,8 @@ try2 <- try1 %>%
 xlim <- c(107007.7280, 647325.1220)
 ylim <- c(-14765.8815, 669163.4051)
 
-ggplot() +
+plot_map <-
+    ggplot() +
     geom_sf(data = la_boundries, fill = "white", aes = 0.1) +
     geom_sf(
         data = try2, aes(alpha = moves, linewidth = moves),
@@ -152,3 +153,10 @@ ggplot() +
         axis.text = element_blank(),
         axis.ticks = element_blank()
     )
+
+
+
+ggsave(
+    filename = "viszs/int_mig_uk.png", plot = plot_map,
+    units = "cm", dpi = 600
+)
