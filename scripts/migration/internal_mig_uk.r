@@ -5,9 +5,7 @@
 
 
 # Libraries --------------
-library(dplyr)
-library(tidyr)
-library(ggplot2)
+library(tidyverse)
 library(geojsonsf)
 library(sf)
 
@@ -53,6 +51,17 @@ la_coords <- la_boundries %>%
     select(c(LAD21CD, LONG, LAT))
 
 
+la_coords <- la_boundries %>%
+    select(c(LAD21CD, geometry)) %>%
+    mutate(
+        LONG = map_dbl(geometry, ~ st_point_on_surface(.x)[[1]]),
+        LAT = map_dbl(geometry, ~ st_point_on_surface(.x)[[2]])
+    ) %>%
+    st_drop_geometry()
+
+
+
+
 dat_comb <- bind_rows(dat1, dat2) %>%
     group_by(outla, inla) %>%
     summarise(moves = sum(moves, na.rm = TRUE)) %>%
@@ -61,13 +70,14 @@ dat_comb <- bind_rows(dat1, dat2) %>%
 
 origin <- dat_comb %>%
     left_join(la_coords, by = c("outla" = "LAD21CD"))
+
 names(origin) <- c("outla", "inla", "moves", "origin_x", "origin_y")
 
 dest <- origin %>%
     left_join(la_coords, by = c("inla" = "LAD21CD")) %>%
     rename(dest_x = LONG) %>%
     rename(dest_y = LAT) %>%
-    filter(moves > 250)
+    filter(moves > 100)
 
 
 xquiet <- scale_x_continuous("", breaks = NULL)
@@ -109,7 +119,7 @@ st_segment <- function(r) {
 }
 
 
-try1$geometry <- st_sfc(sapply(1:nrow(try1),
+try1$geometry <- st_sfc(sapply(1:nrow(try1), # nolint
     function(i) {
         st_segment(try1[i, ])
     },
@@ -126,6 +136,19 @@ try2 <- try1 %>%
     select(c(geometry, moves))
 
 
+xlim <- c(107007.7280, 647325.1220)
+ylim <- c(-14765.8815, 669163.4051)
+
 ggplot() +
-    geom_sf(data = try2, aes(alpha = moves), col = "#1f1f1f") +
-    scale_alpha_continuous(range = c(0.03, 0.3))
+    geom_sf(data = la_boundries, fill = "white", aes = 0.1) +
+    geom_sf(
+        data = try2, aes(alpha = moves, linewidth = moves),
+        col = "#7a0000"
+    ) +
+    scale_alpha_continuous(range = c(0.05, 0.4)) +
+    scale_linewidth_continuous(range = c(0.5, 2)) +
+    coord_sf(xlim = xlim, ylim = ylim, expand = FALSE) +
+    theme(
+        axis.text = element_blank(),
+        axis.ticks = element_blank()
+    )
