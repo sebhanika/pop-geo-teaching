@@ -60,7 +60,6 @@ la_coords <- la_boundries %>%
     st_drop_geometry()
 
 
-
 # Create dataset with in and out coords
 origin <- dat_comb %>%
     left_join(la_coords, by = c("outla" = "LAD21CD"))
@@ -71,86 +70,105 @@ dest <- origin %>%
     left_join(la_coords, by = c("inla" = "LAD21CD")) %>%
     rename(dest_x = LONG) %>%
     rename(dest_y = LAT) %>%
-    filter(moves > 100) # filter needed for visualization
+    filter(moves > 80) # filter needed for visualization
 
 
-xquiet <- scale_x_continuous("", breaks = NULL)
-yquiet <- scale_y_continuous("", breaks = NULL)
-quiet <- list(xquiet, yquiet)
-
-plot_map <-
-    ggplot(dest, aes(origin_x, origin_y)) +
-    geom_segment(aes(
-        x = origin_x, y = origin_y,
-        xend = dest_x, yend = dest_y, alpha = moves
-    ), col = "#1f1f1f") +
-    scale_alpha_continuous(range = c(0.03, 0.3)) +
-    theme_void() +
-    theme(panel.background = element_rect(
-        fill = "#ffffff",
-        colour = "#ffffff"
-    ))
-
-plot_map
-
-ggsave(
-    filename = "viszs/int_mig_uk.png", plot = plot_map,
-    units = "cm", dpi = 600
-)
-
-
-
-
-# Trying out stuff --------------
-
-try1 <- dest %>%
+# Creating multilines from coordinates
+mig_coord <- dest %>%
     select(origin_x, origin_y, dest_x, dest_y) %>%
     drop_na()
-
 
 st_segment <- function(r) {
     st_linestring(t(matrix(unlist(r), 2, 2)))
 }
 
-
-try1$geometry <- st_sfc(sapply(1:nrow(try1), # nolint
+mig_coord$geometry <- st_sfc(sapply(1:nrow(mig_coord), # nolint
     function(i) {
-        st_segment(try1[i, ])
+        st_segment(mig_coord[i, ])
     },
     simplify = FALSE
-), crs = "27700")
+))
 
-try1 <- st_as_sf(try1)
-
-try1 <- try1 %>% st_set_crs(st_crs(la_boundries))
-
-
-try2 <- try1 %>%
+mig_dat <- st_as_sf(mig_coord) %>%
+    st_set_crs(st_crs(la_boundries)) %>%
     left_join(dest) %>%
     select(c(geometry, moves))
 
-
-xlim <- c(107007.7280, 647325.1220)
+# set bounding box manually
+xlim <- c(107007.7280, 657325.1220)
 ylim <- c(-14765.8815, 669163.4051)
 
 plot_map <-
     ggplot() +
-    geom_sf(data = la_boundries, fill = "white", aes = 0.1) +
     geom_sf(
-        data = try2, aes(alpha = moves, linewidth = moves),
-        col = "#7a0000"
+        data = la_boundries, fill = "white",
+        lwd = 0.1, color = "#b6b6b6"
     ) +
-    scale_alpha_continuous(range = c(0.05, 0.4)) +
-    scale_linewidth_continuous(range = c(0.5, 2)) +
+    geom_sf(
+        data = mig_dat, aes(alpha = moves, linewidth = moves),
+        col = "#630101"
+    ) +
+    scale_alpha_continuous("Number of moves", range = c(0.06, 0.45)) +
+    scale_linewidth_continuous("Number of moves", range = c(0.5, 2)) +
     coord_sf(xlim = xlim, ylim = ylim, expand = FALSE) +
     theme(
         axis.text = element_blank(),
-        axis.ticks = element_blank()
+        axis.ticks = element_blank(),
+        legend.position = c(0.87, 0.9)
     )
 
-
+plot_map
 
 ggsave(
     filename = "viszs/int_mig_uk.png", plot = plot_map,
-    units = "cm", dpi = 600
+    units = "cm", dpi = 400
 )
+
+
+
+# Age distribution migrtion
+age_mig <- bind_rows(dat1, dat2) %>%
+    group_by(age) %>%
+    summarise(moves = sum(moves, na.rm = TRUE)) %>%
+    ungroup()
+
+plot_age_mig <-
+    age_mig %>%
+    ggplot(aes(x = age, y = moves)) +
+    geom_line(lwd = 1.25, color = "#000080") +
+    scale_x_continuous(
+        limits = c(0, 110),
+        breaks = seq(0, 110, 10)
+    ) +
+    labs(
+        x = "Age", y = "Number of migrations",
+        caption = "Source: Office for National Statistics (2023)",
+        title = "Age distribution of migration in England & Wales in 2021"
+    )
+plot_age_mig
+
+ggsave(
+    filename = "viszs/age_mig.png", plot = plot_age_mig,
+    width = 32, height = 18,
+    units = "cm"
+)
+
+
+
+
+
+# really trying stuff
+mig <- bind_rows(dat1, dat2)
+
+
+try2 <- bind_rows(dat1, dat2) %>%
+    group_by(outla, inla) %>%
+    summarise(moves = sum(moves, na.rm = TRUE)) %>%
+    ungroup()
+
+# old
+try2 %>%
+    pivot_wider(names_from = outla, values_from = moves) %>%
+    arrange(inla) %>%
+    column_to_rownames(var = "inla") %>%
+    as.matrix()
