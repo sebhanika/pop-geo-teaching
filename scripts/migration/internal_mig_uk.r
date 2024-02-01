@@ -126,35 +126,6 @@ ggsave(
 
 
 
-# Age distribution migrtion
-age_mig <- bind_rows(dat1, dat2) %>%
-    group_by(age) %>%
-    summarise(moves = sum(moves, na.rm = TRUE)) %>%
-    ungroup()
-
-plot_age_mig <-
-    age_mig %>%
-    ggplot(aes(x = age, y = moves)) +
-    geom_line(lwd = 1.25, color = "#000080") +
-    scale_x_continuous(
-        limits = c(0, 110),
-        breaks = seq(0, 110, 10)
-    ) +
-    labs(
-        x = "Age", y = "Number of migrations",
-        caption = "Source: Office for National Statistics (2023)",
-        title = "Age distribution of migration in England & Wales in 2021"
-    )
-plot_age_mig
-
-ggsave(
-    filename = "viszs/age_mig.png", plot = plot_age_mig,
-    width = 32, height = 18,
-    units = "cm"
-)
-
-
-
 
 
 # really trying stuff
