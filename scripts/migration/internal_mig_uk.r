@@ -3,7 +3,6 @@
 # Purpose: Script Purpose
 # /* cSpell:disable */
 
-
 # Libraries --------------
 library(tidyverse)
 library(geojsonsf)
@@ -14,13 +13,17 @@ source("scripts/0_settings.R")
 
 # data downloaded from ONS.gov.uk
 # https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/migrationwithintheuk/datasets/internalmigrationbyoriginanddestinationlocalauthoritiessexandsingleyearofagedetailedestimatesdataset # nolint
-
 # geodata from: https://geoportal.statistics.gov.uk/datasets/7ceb69f99a024752b97ddac6b0323ab0_0/explore?location=55.215503%2C-3.316939%2C6.98 #nolint
-
 
 dat1 <- read.csv(file = "data_download/Detailed_Estimates_2020_LA_2021_Dataset_1.csv") # nolint
 dat2 <- read.csv(file = "data_download/Detailed_Estimates_2020_LA_2021_Dataset_2.csv") # nolint
 
+dat_comb <- bind_rows(dat1, dat2) %>%
+    group_by(outla, inla) %>%
+    summarise(moves = sum(moves, na.rm = TRUE)) %>%
+    ungroup()
+
+# Wkt for geosjon right projection
 bng <- 'PROJCS["OSGB36 / British National Grid",
     GEOGCS["OSGB36",
         DATUM["Ordnance_Survey_of_Great_Britain_1936",
@@ -43,14 +46,11 @@ bng <- 'PROJCS["OSGB36 / British National Grid",
     AXIS["Northing",NORTH],
     AUTHORITY["EPSG","27700"]]'
 
-la_boundries <- geojson_sf("data_download/Local_Authority_Districts_December_2021_UK_BGC_2022_4923559779027843470.geojson", wkt = bng, input = 27700) # nolint
+la_boundries <- geojson_sf("data_download/Local_Authority_Districts_December_2021_UK_BGC_2022_4923559779027843470.geojson", # nolint
+    wkt = bng, input = 27700
+)
 
-
-la_coords <- la_boundries %>%
-    st_drop_geometry() %>%
-    select(c(LAD21CD, LONG, LAT))
-
-
+# Calc Centroid and extract coordinates
 la_coords <- la_boundries %>%
     select(c(LAD21CD, geometry)) %>%
     mutate(
@@ -61,13 +61,7 @@ la_coords <- la_boundries %>%
 
 
 
-
-dat_comb <- bind_rows(dat1, dat2) %>%
-    group_by(outla, inla) %>%
-    summarise(moves = sum(moves, na.rm = TRUE)) %>%
-    ungroup()
-
-
+# Create dataset with in and out coords
 origin <- dat_comb %>%
     left_join(la_coords, by = c("outla" = "LAD21CD"))
 
@@ -77,7 +71,7 @@ dest <- origin %>%
     left_join(la_coords, by = c("inla" = "LAD21CD")) %>%
     rename(dest_x = LONG) %>%
     rename(dest_y = LAT) %>%
-    filter(moves > 100)
+    filter(moves > 100) # filter needed for visualization
 
 
 xquiet <- scale_x_continuous("", breaks = NULL)
