@@ -124,22 +124,4 @@ ggsave(
     units = "cm", dpi = 400
 )
 
-
-
-
-
-# really trying stuff
-mig <- bind_rows(dat1, dat2)
-
-
-try2 <- bind_rows(dat1, dat2) %>%
-    group_by(outla, inla) %>%
-    summarise(moves = sum(moves, na.rm = TRUE)) %>%
-    ungroup()
-
-# old
-try2 %>%
-    pivot_wider(names_from = outla, values_from = moves) %>%
-    arrange(inla) %>%
-    column_to_rownames(var = "inla") %>%
-    as.matrix()
+# change map to show net migration? and direction flows?
