@@ -41,21 +41,6 @@ dat_comb <- le_dat %>%
     left_join(pop_dat)
 
 
-
-
-
-
-
-
-# scale_size_binned(
-#         breaks = c(1, 100000000, 500000000, 1000000000),
-#         range = c(1, 20)
-#     ) +
-
-?scale_size
-
-
-
 plot_le_econ <-
     dat_comb %>%
     filter(date == 2021) %>%
@@ -123,11 +108,8 @@ plot_anim <- dat_comb %>%
 
 gif_le_econ <- plot_anim +
     transition_time(date) +
-    labs(title = "Year: {frame_time}") +
+    labs(title = "GDP per Captia and Female Life Expectancy in: {frame_time}") +
     shadow_mark(alpha = 0.3, size = 0.5)
-
-
-
 
 anim_save("viszs/le_econ.gif", gif_le_econ,
     fps = 7,
