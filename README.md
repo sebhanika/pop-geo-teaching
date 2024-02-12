@@ -3,8 +3,8 @@
 This repository includes the scripts and materials for an introductory module in population geography at the Department of Human Geography at Lund University. 
 The module is divided into three lectures (8 hours total) which cover the basic processes and drivers in the field of population geography. 
 
-### Slides
-Shortly before the first round of lectures, the slides will be uploaded to this folder.
+### Presentation
+The original PDF files for the presentations are unfortunately too large and I will find another way to present the materials used in the lectures. I might instead add shortened versions or handouts over the coming months and during the revision of the course
 
 ### Materials
 The original graphs and maps can be found in this [folder](viszs/). While the graphs should be easily visible in the presentation it also contains the GIF files which do not work in the PDF files. However, the GIF files are also directly in each respective slide.
