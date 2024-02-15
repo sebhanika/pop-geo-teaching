@@ -59,6 +59,8 @@ xlim <- c(2426378.0132, 6593974.6215)
 ylim <- c(1328101.2618, 5446513.5222)
 
 data_bins <- BAMMtools::getJenksBreaks(dat_mig$mig_rate, k = 6)
+# set clean breaks manually because rounding does not work
+# based on the values with data_bins
 data_bins_clean <- c(-32.8, -9.1, -1, 1, 8.1, 40.4)
 
 data_labs <- paste(
