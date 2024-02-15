@@ -50,14 +50,16 @@ dat_map <- nuts3 %>% left_join(age_dat, by = c("geo"))
 
 data_bins <- BAMMtools::getJenksBreaks(dat_map$values, k = 6)
 
+data_labs <- paste(
+    round(data_bins[-length(data_bins)], 2),
+    " - ",
+    round(data_bins[-1], 2)
+)
+
 med_age <- dat_map %>%
     mutate(val_int = cut(values,
-        breaks = data_bins, ,
-        labels = c(
-            "33.8 - 40.7", "40.7 - 43.8",
-            "43.8 - 46.5", "46.5 - 49.5",
-            "49.5 - 55.8"
-        ),
+        breaks = data_bins,
+        labels = data_labs,
         include.lowest = TRUE
     ))
 
