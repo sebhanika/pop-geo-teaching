@@ -3,6 +3,7 @@
 # Purpose: This is a settings file that will be tracked by git
 # /* cSpell:disable */
 
+library(ggplot2)
 library(ggthemes)
 options(scipen = 999)
 

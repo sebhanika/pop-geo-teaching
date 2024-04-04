@@ -43,19 +43,21 @@ le_comb <- do.call(dplyr::bind_rows, le)
 # filters for max value in each year
 # however in 1861 there are two max values (DKK, SWE)
 le_max <- le_comb %>%
+    select(c(Year, Female, CNTRY)) %>%
     filter(CNTRY != "BLR") %>% # exlcude Belarus (data quality issues)
     group_by(Year) %>%
-    filter(Female == max(Female, na.rm = TRUE)) %>%
-    ungroup() %>%
+    filter(
+        Female == max(Female, na.rm = TRUE),
+        Year %in% 1840:2022
+    ) %>%
     arrange(Year) %>%
-    distinct(Year, Female, .keep_all = TRUE) %>%
-    filter(Year %in% c(1840:2021)) %>%
+    ungroup() %>%
     mutate(country_name = case_when(
         CNTRY == "SWE" ~ "Sweden",
         CNTRY == "ISL" ~ "Iceland",
         CNTRY == "DNK" ~ "Denmark",
         CNTRY == "NOR" ~ "Norway",
-        CNTRY == "NZL_NM" ~ "New Zealand (non-Maori)",
+        CNTRY == "NZL_NM" ~ "New Zealand (non-Māori)",
         CNTRY == "JPN" ~ "Japan",
         CNTRY == "HKG" ~ "Hongkong",
         TRUE ~ CNTRY
@@ -91,12 +93,12 @@ legend(
     legend = max_cntrs,
     pch = factor(levels(factor(le_max$CNTRY))),
     col = factor(levels(factor(le_max$CNTRY))),
-    cex = 1.5
+    cex = 1,
 )
 
-title("Record Female Life Expectancy", adj = 0, line = 0.3)
-mtext("Source: Human Mortality Database (2023)\nafter Oeppen and Vaupel (2002)",
-    side = 1, adj = 1, line = 3.5
+title("Record Female Life Expectancy (1840-2022)", adj = 0, line = 0.4)
+mtext("Source: Human Mortality Database (2024)\nbased on work by Oeppen and Vaupel (2002)\nand visualized using R.",
+    side = 1, adj = 0, at = 1977, line = 3.5, cex = 0.7
 )
 
 dev.off()
