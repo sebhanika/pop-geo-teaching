@@ -83,9 +83,9 @@ grp_rat <- c(
 
 # labels for legend
 grp_labs <- c(
-    ">100% excess female mortality", "75 to 100%", "50 to 75%", "25 to 50%", "2 to 25%",
+    ">100% excess\nfemale mortality", "75 to 100%", "50 to 75%", "25 to 50%", "2 to 25%",
     "~ Equal mortality",
-    "2 to 25%", "25 to 50%", "50to 75%", "75 to 100%", ">100% excess male mortality"
+    "2 to 25%", "25 to 50%", "50 to 75%", "75 to 100%", ">100% excess\nmale mortality"
 )
 
 # colors for graphs
@@ -213,24 +213,90 @@ p_comb <- dat_comb |>
     labs(
         x = "Year",
         y = "Age",
-        title = "Lexis Diagram Male-female mortality ratio - selected European countries",
-        caption = "Source: Human Mortality Database (2024)\ninspired by work by Schönley & Willekens (2017)\nand visualized using R."
+        title = "Visualizing Male-Female Mortality Ratios: Insights from Lexis Diagrams (1900 - 2023)",
+        caption = "Source: Human Mortality Database (2024)\ninspired by Schönley & Willekens (2017) and visualized using R."
     ) +
     theme(
+        # panel styling
         axis.ticks = element_blank(),
         axis.line = element_blank(),
+        axis.title.x = element_text(margin = margin(t = 5)),
         panel.grid = element_line(linetype = 3, color = "#666666"),
         panel.ontop = TRUE,
+        plot.background = element_rect(fill = "white"),
         rect = element_blank(),
         panel.border = element_blank(),
         line = element_blank(),
+        # Text and legend
         legend.text = element_text(size = 16),
-        plot.title = element_text(size = 20),
-        axis.title.x = element_text(margin = margin(t = 5)),
-        plot.background = element_rect(fill = "white"),
-        strip.text = element_text(size = 16)
+        legend.title = element_text(size = 18, color = "grey30"),
+        plot.title = element_text(size = 24),
+        strip.text = element_text(size = 18),
+        legend.key.size = unit(1.5, "cm")
     )
 
 ggsave("viszs/lexis/combined_plot.png", p_comb,
-    width = 50, height = 40, units = "cm"
+    width = 48, height = 40, units = "cm", dpi = 500
+)
+
+
+
+
+
+
+# Selected countries --------------
+
+
+p_comb2 <- dat_comb |>
+    subset(cntry %in% c("DNK", "FRATNP", "FIN", "GBRTENW")) |>
+    ggplot(aes(x = year, y = age, fill = rat_group)) +
+    geom_tile() +
+    geom_abline(
+        slope = 1, intercept = seq(-1800, -2020, by = -10),
+        linetype = 3, color = "#666666"
+    ) +
+    facet_wrap(~cntry_name) +
+    coord_fixed() +
+    scale_fill_manual(
+        "Male-female mortality ratio",
+        values = nv_grp_cols,
+        labels = nv_grp_labs
+    ) +
+    scale_x_continuous(
+        limits = c(1899, 2024),
+        breaks = seq(1910, 2023, 20),
+        expand = c(0, 0)
+    ) +
+    scale_y_continuous(
+        limits = c(-1, 101),
+        breaks = seq(0, 100, 20),
+        expand = c(0, 0)
+    ) +
+    labs(
+        x = "Year",
+        y = "Age",
+        title = "Visualizing Male-Female Mortality Ratios: Insights from Lexis Diagrams (1900 - 2023)",
+        caption = "Source: Human Mortality Database (2024)\ninspired by Schönley & Willekens (2017) and visualized using R."
+    ) +
+    theme(
+        # panel styling
+        axis.ticks = element_blank(),
+        axis.line = element_blank(),
+        axis.title.x = element_text(margin = margin(t = 5)),
+        panel.grid = element_line(linetype = 3, color = "#666666"),
+        panel.ontop = TRUE,
+        plot.background = element_rect(fill = "white"),
+        rect = element_blank(),
+        panel.border = element_blank(),
+        line = element_blank(),
+        # Text and legend
+        legend.text = element_text(size = 16),
+        legend.title = element_text(size = 18, color = "grey30"),
+        plot.title = element_text(size = 24),
+        strip.text = element_text(size = 18),
+        legend.key.size = unit(1.5, "cm")
+    )
+
+ggsave("viszs/lexis/combined_plot_selected.png", p_comb2,
+    width = 48, height = 40, units = "cm", dpi = 500
 )
