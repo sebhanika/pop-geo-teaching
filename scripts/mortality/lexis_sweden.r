@@ -150,7 +150,8 @@ for (i in hmd_cntr) {
         labs(
             x = "Year",
             y = "Age",
-            title = paste("Lexis-Diagram Male-female mortality ratio -", unique(df_cntry$cntry_name))
+            title = paste("Lexis Diagram Male-female mortality ratio -", unique(df_cntry$cntry_name)),
+            caption = "Source: Human Mortality Database (2024)"
         ) +
         theme(
             axis.ticks = element_blank(),
@@ -212,7 +213,8 @@ p_comb <- dat_comb |>
     labs(
         x = "Year",
         y = "Age",
-        title = "Lexis-Diagram Male-female mortality ratio - selected countries"
+        title = "Lexis Diagram Male-female mortality ratio - selected European countries",
+        caption = "Source: Human Mortality Database (2024)\ninspired by work by Schönley & Willekens (2017)\nand visualized using R."
     ) +
     theme(
         axis.ticks = element_blank(),
@@ -222,7 +224,8 @@ p_comb <- dat_comb |>
         rect = element_blank(),
         panel.border = element_blank(),
         line = element_blank(),
-        legend.text = element_text(size = 14),
+        legend.text = element_text(size = 16),
+        plot.title = element_text(size = 20),
         axis.title.x = element_text(margin = margin(t = 5)),
         plot.background = element_rect(fill = "white"),
         strip.text = element_text(size = 16)
