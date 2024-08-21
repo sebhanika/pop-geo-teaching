@@ -1,6 +1,6 @@
-# Title: Population pyramids
-# Date: 2023-10-10
-# Purpose: Script Purpose
+# Title: age_structure_swe
+# Date: 2024-08-21
+# Purpose: Animated population pyramid sweden
 
 # /* cSpell:disable */
 
@@ -9,7 +9,6 @@ library(ggplot2)
 library(tidyr)
 library(HMDHFDplus)
 library(gganimate)
-library(nationalparkcolors)
 
 source("scripts/0_config.R")
 source("scripts/0_settings.R")
@@ -36,13 +35,7 @@ swe_pop_pyr <- readHMDweb(
     janitor::clean_names() %>%
     mutate(sex = factor(sex, levels = c("male", "female")))
 
-
-# Static graph/four years --------------
-
-##### old pyramid code
-
 # Settings for labeling and filter for plot
-years_p <- c(1872, 1922, 1972, 2022)
 max_pop <- max(swe_pop_pyr$pop)
 
 # get first two digits of rounded max pop. expressed in thousands
@@ -54,46 +47,6 @@ pop_brks <- seq(-max_pop_lim, max_pop_lim, max_pop_lim / 2)
 # get nice labels
 pop_labels <- abs(seq(-max_pop_label, max_pop_label, max_pop_label / 2))
 
-
-# age pyramid plot
-age_pyrs <- swe_pop_pyr %>%
-    filter(year %in% years_p) %>%
-    ggplot(aes(
-        x = age,
-        y = ifelse(sex == "male", -pop, pop),
-        fill = sex
-    )) +
-    geom_bar(stat = "identity") +
-    scale_y_continuous(
-        limits = c(-max(swe_pop_pyr$pop), max(swe_pop_pyr$pop)),
-        breaks = pop_brks,
-        labels = pop_labels
-    ) +
-    scale_fill_manual(
-        values = park_palette("ArcticGates", 2),
-        labels = c("Male", "Female")
-    ) +
-    coord_flip() +
-    labs(
-        x = "Age",
-        y = "Population in Thousand",
-        caption = "Source: Human Mortality Database"
-    ) +
-    facet_wrap(~year) +
-    theme(
-        legend.position = "bottom",
-        legend.title = element_blank()
-    )
-age_pyrs
-
-# save plot
-ggsave(
-    filename = "graphs/age_pyr_swe.png",
-    plot = age_pyrs,
-    width = 25, height = 25, units = "cm"
-)
-
-
 # GGanimate --------------
 
 # create plot for animation
@@ -104,35 +57,34 @@ pyr_anim <- swe_pop_pyr %>%
         y = ifelse(sex == "male", -pop, pop),
         pop, fill = sex
     )) +
-    geom_bar(stat = "identity") +
+    geom_bar(stat = "identity", width = 0.6) +
     scale_y_continuous(
         limits = c(-max(swe_pop_pyr$pop), max(swe_pop_pyr$pop)),
         breaks = pop_brks,
         labels = pop_labels
     ) +
     scale_fill_manual(
-        values = c("#cfb470", "#678096"),
+        values = c("#8392b6", "#c3a088"),
         labels = c("Male", "Female")
     ) +
     coord_flip() +
     labs(
         x = "Age",
         y = "Population in Thousand",
-        caption = "Source: Human Mortality Database"
+        caption = "Source: Human Mortality Database (2024)"
     ) +
     theme(
         legend.position = "bottom",
         legend.title = element_blank()
     )
 
-
 # create animation
 age_pyr_gif <- pyr_anim +
     transition_time(year) +
-    labs(title = "Year: {frame_time}")
+    labs(title = "Age Structure in Sweden in: {frame_time}")
 
-anim_save("graphs/age_pyr_animated.gif", age_pyr_gif,
-    fps = 7,
+anim_save("viszs/age_pyr_swe_animated.gif", age_pyr_gif,
+    fps = 6,
     renderer = gifski_renderer(loop = TRUE),
     height = 18, width = 32, units = "cm", res = 150
 )
