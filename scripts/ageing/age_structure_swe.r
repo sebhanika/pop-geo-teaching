@@ -55,9 +55,10 @@ pyr_anim <- swe_pop_pyr %>%
     ggplot(aes(
         x = age,
         y = ifelse(sex == "male", -pop, pop),
-        pop, fill = sex
+        pop,
+        fill = sex
     )) +
-    geom_bar(stat = "identity", width = 0.6) +
+    geom_bar(stat = "identity", width = 1) +
     scale_y_continuous(
         limits = c(-max(swe_pop_pyr$pop), max(swe_pop_pyr$pop)),
         breaks = pop_brks,
