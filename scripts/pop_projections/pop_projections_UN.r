@@ -70,8 +70,7 @@ comb_dat <- bind_rows(pop_hist, pop_proj) |>
                 "Low Fertility"
             )
         )
-    ) |>
-    mutate(value = value / 1000000)
+    )
 
 
 # World Data --------------
@@ -79,21 +78,20 @@ comb_dat <- bind_rows(pop_hist, pop_proj) |>
 wpp_2022_p <-
     comb_dat |>
     filter(name == "World") |>
+    mutate(value = value / 1000000) |> # turn data into billion
     ggplot(aes(
         x = year,
         y = value,
-        color = categ
+        color = categ,
+        linetype = categ
     )) +
-    # scale_linetype_manual(values = c(
-    #     "solid", "solid",
-    #     "dotted", "dashed",
-    #     "dotted", "dashed",
-    #     "dotted", "dashed"
-    # )) +
+    scale_linetype_manual(values = c(
+        2, 3, 4, 1, 1, 4, 3, 2
+    )) +
     scale_color_manual(values = c(
         "#b2182b", "#ef8a62",
         "#fddbc7",
-        "black", "black",
+        "#6a6a6a", "black",
         "#d1e5f0",
         "#67a9cf", "#2166ac"
     )) +
@@ -106,9 +104,70 @@ wpp_2022_p <-
     ) +
     labs(
         x = "Year", y = "Population in billion",
-        title = "Population Projection Scenarios",
-        subtitle = "based on World Population Prospects 2022"
+        title = "Population Projection Scenarios - World",
+        caption = "Source: World Population Prospects (2022)"
     ) +
-    theme(legend.title = element_blank())
+    theme(
+        legend.title = element_blank(),
+        legend.key.size = unit(2, "line")
+    )
 
 wpp_2022_p
+
+ggsave("viszs/pop_proj2022.png", plot = wpp_2022_p, width = 32, height = 18, units = "cm")
+
+# Regional
+
+regio_wpp_2022_p <-
+    comb_dat |>
+    mutate(
+        name = ifelse(grepl("Oceania", name), "Oceania", name),
+        value = value / 1000
+    ) |>
+    filter(name != "World") |>
+    ggplot(aes(
+        x = year,
+        y = value,
+        color = categ,
+        linetype = categ
+    )) +
+    scale_linetype_manual(values = c(
+        2, 3, 4, 1, 1, 4, 3, 2
+    )) +
+    scale_color_manual(values = c(
+        "#b2182b", "#ef8a62",
+        "#fddbc7",
+        "#6a6a6a", "black",
+        "#d1e5f0",
+        "#67a9cf", "#2166ac"
+    )) +
+    geom_line(linewidth = 1.15) +
+    geom_vline(
+        xintercept = 2022,
+        alpha = 0.6,
+        color = "darkred",
+        linetype = 2
+    ) +
+    facet_wrap(~name,
+        scales = "free",
+        nrow = 2,
+        labeller = label_wrap_gen(30)
+    ) +
+    labs(
+        x = "Year", y = "Population in million",
+        title = "Population Projection Scenarios - UN Regions",
+        caption = "Source: World Population Prospects (2022)"
+    ) +
+    theme(
+        legend.title = element_blank(),
+        legend.position = "right",
+        legend.key.size = unit(2, "line"),
+        axis.text = element_text(size = 10)
+    )
+
+regio_wpp_2022_p
+
+ggsave("viszs/regio_pop_proj2022.png",
+    plot = regio_wpp_2022_p,
+    width = 40, height = 20, units = "cm"
+)
