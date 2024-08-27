@@ -58,7 +58,7 @@ pyr_anim <- swe_pop_pyr %>%
         pop,
         fill = sex
     )) +
-    geom_bar(stat = "identity", width = 1) +
+    geom_bar(stat = "identity", width = 1, alpha = 0.8) +
     scale_y_continuous(
         limits = c(-max(swe_pop_pyr$pop), max(swe_pop_pyr$pop)),
         breaks = pop_brks,
