@@ -57,10 +57,10 @@ plot_country_proj <- dat_country_proj %>%
         x = time, y = values_new,
         color = projection, linetype = projection
     )) +
-    geom_line(lwd = 1.15) +
+    geom_line(lwd = 1.2) +
     scale_color_manual(
         values = c(
-            "#252525", "#b2182b", "#ef8a62", "#fddbc7",
+            "#252525", "#83111e", "#eb6a37", "#c98b68",
             "#4393c3", "#35978f"
         ),
         labels = proj_labels
