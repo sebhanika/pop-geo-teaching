@@ -32,32 +32,30 @@ borders <- st_polygon(swe_borders) %>%
     st_geometry() %>%
     st_as_text()
 
-
-eurostat_dat1 <- st_read(
+dat_swe <- st_read(
     dsn = "data_download/grid_1km_surf.gpkg",
     wkt_filter = borders
 )
 
-str(eurostat_dat1)
-
-
-
-
 # Create list of plots
-plot_swe <- eurostat_dat1 %>%
-    filter(TOT_P_2021 > 0) |>
+plot_swe <- dat_swe %>%
+    filter(TOT_P_2021 > 1) |>
     ggplot() +
-    geom_sf(aes(fill = TOT_P_2021), color = NA) +
+    geom_sf(aes(fill = (TOT_P_2021)), color = NA) +
     scale_fill_gradient(
         name = "Population",
-        low = "#e1d8ff", high = "#1b153d"
+        low = "#e8e3f8", high = "#1b153d",
+    ) +
+    labs(
+        title = "Population Density Sweden 2021",
+        caption = "Source: Eurostat (2024)"
     ) +
     theme(
         axis.text = element_blank(),
         axis.ticks = element_blank(),
+        legend.text = element_text(size = 14),
         legend.key.height = unit(2, "cm")
     )
-
 
 ggsave(
     filename = "viszs/plot_swe4.png",
