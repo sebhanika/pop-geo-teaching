@@ -1,14 +1,18 @@
+# Title: pop_dens_countries
+# Date: 2024-09-04
+# Purpose: Population density for different countries
+
 # /* cSpell:disable */
 
 # Libraries and setup -----------------------------------------------------
 
-library(tidyverse)
+library(dplyr)
+library(ggplot2)
 library(sf)
 library(osmdata)
 
 source("scripts/0_config.R")
 source("scripts/0_settings.R")
-
 
 # download kontur data ----------------------------------------------------
 
@@ -78,18 +82,14 @@ for (i in country.names) {
         geom_sf(color = NA) +
         scale_fill_gradient(
             name = "Population",
-            low = "#e3daff", high = "#1b153d",
-            guide = guide_colourbar(
-                direction = "horizontal",
-                barwidth = 10
-            )
+            low = "#ede9f8", high = "#1c1738"
         ) +
-        theme_bw() +
+        labs(caption = "Kontur Population Dataset (2023)") +
         theme(
-            axis.text = element_blank(),
-            panel.background = element_rect(fill = "white"),
             legend.position = "bottom",
-            panel.grid = element_blank(),
+            legend.text = element_text(size = 14),
+            legend.key.width = unit(1.5, "cm"),
+            axis.text = element_blank(),
             axis.ticks = element_blank()
         )
 
@@ -115,14 +115,13 @@ invisible(
 
 
 
-# Egypt, somethow does not work:axis.text
+# Egypt, somethow does not work, the second list element is another list
+# Select that and then run
 egypt_borders <- getbb("Egypt", format_out = "polygon", featuretype = "country")
+egypt_borders_fixed <- egypt_borders[[2]]
 
 
-g <- egypt_borders[[2]]
-
-
-borders <- st_polygon(g) %>%
+borders <- st_polygon(egypt_borders_fixed) %>%
     st_sfc(crs = 4326) %>%
     st_transform(3857) %>%
     st_geometry() %>%
@@ -136,25 +135,21 @@ dat_egypt <- st_read(
 
 # Create list of plots
 plot_egypt <- dat_egypt %>%
+    mutate(population = population / 10000) |>
     ggplot(aes(fill = population)) +
     geom_sf(color = NA) +
     scale_fill_gradient(
-        name = "Population",
-        low = "#e8e3f8", high = "#1b153d",
-        guide = guide_colourbar(
-            direction = "horizontal",
-            barwidth = 10
-        )
+        name = "Population in 10k",
+        low = "#ede9f8", high = "#1c1738"
     ) +
-    theme_bw() +
+    labs(caption = "Kontur Population Dataset (2023)") +
     theme(
-        axis.text = element_blank(),
-        panel.background = element_rect(fill = "white"),
         legend.position = "bottom",
-        panel.grid = element_blank(),
+        legend.text = element_text(size = 16),
+        legend.key.width = unit(1.5, "cm"),
+        axis.text = element_blank(),
         axis.ticks = element_blank()
     )
-
 
 ggsave(
     filename = "viszs/plot_egypt.png",
@@ -163,4 +158,54 @@ ggsave(
     width = 22,
     height = 22,
     unit = "cm"
+)
+
+
+# USA --------------
+
+# Load data for USA (lower 48)
+
+usa <- getbb("United States", format_out = "polygon", featuretype = "country")
+# get only lowr48
+usa_l48 <- usa[[38]]
+
+# transform borders
+borders <-
+    st_polygon(list(usa_l48)) %>%
+    st_sfc(crs = 4326) %>%
+    st_transform(3857) %>%
+    st_geometry() %>%
+    st_as_text()
+
+# load country specific data into R
+dat_usa <- st_read(
+    dsn = "data_download/kontur_data.gpkg", layer = "population",
+    wkt_filter = borders
+)
+
+# Create list of plots
+plot_usa <- dat_usa %>%
+    ggplot(aes(fill = log(population))) +
+    geom_sf(color = NA) +
+    scale_fill_gradient(
+        name = "Population (log)",
+        low = "#ede9f8", high = "#1c1738"
+    ) +
+    labs(caption = "Kontur Population Dataset (2023)") +
+    theme(
+        legend.position = "bottom",
+        legend.text = element_text(size = 16),
+        legend.key.width = unit(1.5, "cm"),
+        axis.text = element_blank(),
+        axis.ticks = element_blank()
+    )
+
+ggsave(
+    filename = "viszs/plot_usa3.png",
+    plot = plot_usa,
+    bg = "white",
+    width = 22,
+    height = 22,
+    unit = "cm",
+    dpi = 150
 )
