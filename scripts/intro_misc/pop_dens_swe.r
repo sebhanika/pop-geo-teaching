@@ -41,10 +41,10 @@ dat_swe <- st_read(
 plot_swe <- dat_swe %>%
     filter(TOT_P_2021 > 1) |>
     ggplot() +
-    geom_sf(aes(fill = (TOT_P_2021)), color = NA) +
+    geom_sf(aes(fill = log(TOT_P_2021)), color = NA) +
     scale_fill_gradient(
-        name = "Population",
-        low = "#e8e3f8", high = "#1b153d",
+        name = "Population (log)",
+        low = "#ede9f8", high = "#1c1738"
     ) +
     labs(
         title = "Population Density Sweden 2021",
@@ -54,15 +54,15 @@ plot_swe <- dat_swe %>%
         axis.text = element_blank(),
         axis.ticks = element_blank(),
         legend.text = element_text(size = 14),
-        legend.key.height = unit(2, "cm")
+        legend.key.height = unit(1.2, "cm")
     )
 
 ggsave(
-    filename = "viszs/plot_swe4.png",
+    filename = "viszs/plot_dens_swe.png",
     plot = plot_swe,
     bg = "white",
-    width = 22,
-    height = 22,
+    width = 25,
+    height = 25,
     unit = "cm",
-    dpi = 400
+    dpi = 500
 )
