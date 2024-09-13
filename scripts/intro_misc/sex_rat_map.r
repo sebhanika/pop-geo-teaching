@@ -1,6 +1,6 @@
-# Title: Refugees
+# Title: sex_rat_nap
 # Date: 2024-02-06
-# Purpose: GLobal refugee populations
+# Purpose: World map of Sex Ratios
 # /* cSpell:disable */
 
 # Libraries --------------
@@ -82,7 +82,7 @@ plot_pop_sf_2 <- pop_sf_2 %>%
     geom_sf(aes(fill = as.factor(val_int)),
         linewidth = 0.1, alpha = 1
     ) +
-    scale_fill_manual("Sex ratio ",
+    scale_fill_manual("Sex ratio\n(Male/Female)",
         values = self_palette,
         na.value = "#a7a7a7"
     ) +
