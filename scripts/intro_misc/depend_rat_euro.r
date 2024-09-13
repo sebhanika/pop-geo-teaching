@@ -47,7 +47,7 @@ plot_rat65 <-
     scale_color_manual(values = c("lightblue", "#9C6114", "#000080")) +
     scale_linetype_manual(values = c(1, 2, 3)) +
     labs(
-        title = "Increases in dependency ratios in Europe",
+        title = "Trends in old-age dependency ratios in Europe",
         x = "Year",
         y = "Old-age depedency ratio (65+)",
         caption = "Source: Eurostat (2024)"
