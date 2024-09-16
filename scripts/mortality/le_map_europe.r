@@ -36,7 +36,7 @@ le <- get_eurostat("demo_r_mlifexp", time_format = "num") %>%
     filter(
         age == "Y_LT1",
         nchar(geo) == 4,
-        TIME_PERIOD == 2021
+        TIME_PERIOD == 2022
     ) %>%
     pivot_wider(
         names_from = sex,
@@ -84,11 +84,11 @@ p_le_map <- le_map %>%
         linewidth = 0.1, alpha = 1
     ) +
     coord_sf(xlim = xlim, ylim = ylim, expand = FALSE) +
-    scale_fill_manual("Life Expectancy (2019)",
+    scale_fill_manual("Total Life Expectancy\n(2022)",
         values = self_palette,
         na.value = "#a7a7a7"
     ) +
-    labs(caption = "Source: Eurostat (2023)") +
+    labs(caption = "Source: Eurostat (2024)") +
     theme(
         axis.text = element_blank(),
         axis.ticks = element_blank(),
