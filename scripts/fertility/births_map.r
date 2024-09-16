@@ -33,7 +33,7 @@ nuts2_v1 <-
 
 pop <- get_eurostat("demo_r_d2jan", time_format = "num") %>%
     filter(
-        TIME_PERIOD == 2019,
+        TIME_PERIOD == 2022,
         nchar(geo) == 4,
         age == "TOTAL",
         sex == "T"
@@ -44,7 +44,7 @@ pop <- get_eurostat("demo_r_d2jan", time_format = "num") %>%
 
 dat_births <- get_eurostat("demo_r_fagec", time_format = "num") %>%
     filter(
-        TIME_PERIOD == 2019,
+        TIME_PERIOD == 2022,
         nchar(geo) == 4,
         age == "TOTAL"
     ) %>%
@@ -91,11 +91,11 @@ p_cbr_map <- births_sf %>%
         linewidth = 0.1, alpha = 1
     ) +
     coord_sf(xlim = xlim, ylim = ylim, expand = FALSE) +
-    scale_fill_manual("CBR (2019)",
+    scale_fill_manual("CBR (2022)",
         values = self_palette,
         na.value = "#a7a7a7"
     ) +
-    labs(caption = "Source: Eurostat (2023)") +
+    labs(caption = "Source: Eurostat (2024)") +
     theme(
         axis.text = element_blank(),
         axis.ticks = element_blank(),
