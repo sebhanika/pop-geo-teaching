@@ -242,13 +242,11 @@ ggsave("viszs/lexis/combined_plot.png", p_comb,
 
 
 
-
-
 # Selected countries --------------
 
 
 p_comb2 <- dat_comb |>
-    subset(cntry %in% c("DNK", "FRATNP", "FIN", "GBRTENW")) |>
+    subset(cntry %in% c("SWE", "FRATNP", "FIN", "GBRTENW")) |>
     ggplot(aes(x = year, y = age, fill = rat_group)) +
     geom_tile() +
     geom_abline(
