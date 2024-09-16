@@ -71,7 +71,7 @@ p_normal_pyrs <- pop_dat %>%
     coord_flip() +
     labs(
         x = "Age",
-        y = "Population in Thousand",
+        y = "Share of population",
         caption = "Source: World Population Prospects (2022)",
         title = ""
     ) +
@@ -88,11 +88,7 @@ ggsave("viszs/p_normal_pyrs.png",
 )
 
 
-# do crazy pyramids
-
-
-
-
+# Some unusual examples
 p_crazy_pyrs <- pop_dat %>%
     filter(name %in% c("Monaco", "United Arab Emirates", "Sint Maarten (Dutch part)")) |>
     ggplot(aes(
@@ -115,7 +111,7 @@ p_crazy_pyrs <- pop_dat %>%
     coord_flip() +
     labs(
         x = "Age",
-        y = "Population in Thousand",
+        y = "Share of population",
         caption = "Source: World Population Prospects (2022)",
         title = ""
     ) +
