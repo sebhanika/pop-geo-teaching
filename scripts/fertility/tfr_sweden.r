@@ -10,16 +10,16 @@ library(ggplot2)
 library(tidyr)
 library(HMDHFDplus)
 library(countrycode)
-library(nationalparkcolors)
 
 source("scripts/0_config.R")
 source("scripts/0_settings.R")
 
+saguaro <- c("#847CA3", "#E45A5A", "#F4A65E", "#80792B", "#F2D56F", "#1A1237")
+
 # TFR --------------
 
 # Specify countries of interest
-tfr_countries <- c("SWE")
-
+tfr_countries <- c("SWE", "DNK", "ITA")
 
 # create labels
 cntry_labels <- setNames(
@@ -61,7 +61,7 @@ tfr_plot <- tfr_comb %>%
         breaks = seq(1900, 2020, 20)
     ) +
     scale_color_manual(
-        values = park_palette("Saguaro"),
+        values = saguaro,
         labels = cntry_labels
     ) +
     scale_linetype_manual(
@@ -78,14 +78,21 @@ tfr_plot <- tfr_comb %>%
         label = "Replacement-level fertility"
     ) +
     theme(
-        legend.position = "None"
+        legend.position = c(0.9, 0.88),
+        legend.text = element_text(size = 16),
+        legend.background = element_rect(
+            linetype = "solid",
+            color = "black"
+        ),
+        legend.title = element_blank(),
+        legend.key.width = unit(1.5, "cm")
     )
 tfr_plot
 
 
 # save plot presentation
 ggsave(
-    filename = "viszs/tfr_sweden.png",
+    filename = "viszs/tfr_Nordic_comp.png",
     plot = tfr_plot,
     width = 32, height = 18, units = "cm"
 )
