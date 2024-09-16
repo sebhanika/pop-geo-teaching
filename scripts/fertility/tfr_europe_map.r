@@ -35,7 +35,7 @@ nuts2_v1 <-
 dat_tfr <- get_eurostat("tgs00100", time_format = "num") %>%
     filter(
         nchar(geo) == 4,
-        TIME_PERIOD == 2020
+        TIME_PERIOD == 2022
     ) %>%
     select(c(geo, values, TIME_PERIOD)) %>%
     rename(tfr = values)
@@ -54,7 +54,7 @@ self_palette <- c(
 )
 
 # bounding box
-xlim <- c(2426378.0132, 6593974.6215)
+xlim <- c(2426378.0132, 7353974.6215)
 ylim <- c(1328101.2618, 5446513.5222)
 
 data_bins <- BAMMtools::getJenksBreaks(dat_tfr$tfr, k = 6)
@@ -80,11 +80,11 @@ p_tfr_map <- tfr_sf %>%
         linewidth = 0.1, alpha = 1
     ) +
     coord_sf(xlim = xlim, ylim = ylim, expand = FALSE) +
-    scale_fill_manual("Total Fertility Rate (2020)",
+    scale_fill_manual("Total Fertility Rate (2022)",
         values = self_palette,
         na.value = "#a7a7a7"
     ) +
-    labs(caption = "Source: Eurostat (2023)") +
+    labs(caption = "Source: Eurostat (2024)") +
     theme(
         axis.text = element_blank(),
         axis.ticks = element_blank(),
@@ -95,8 +95,7 @@ p_tfr_map <- tfr_sf %>%
 
 p_tfr_map
 
-
 ggsave(
-    filename = "viszs/tfr_maps_NUTS2.png",
+    filename = "viszs/tfr_maps_NUTS21.png",
     plot = p_tfr_map, width = 28, height = 28, units = "cm"
 )
