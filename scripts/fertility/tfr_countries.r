@@ -10,16 +10,16 @@ library(ggplot2)
 library(tidyr)
 library(HMDHFDplus)
 library(countrycode)
-library(nationalparkcolors)
 
 source("scripts/0_config.R")
 source("scripts/0_settings.R")
 
+saguaro <- c("#847CA3", "#E45A5A", "#F4A65E", "#80792B", "#F2D56F", "#1A1237")
+
 # TFR --------------
 
 # Specify countries of interest
-tfr_countries <- c("SWE", "PRT", "CAN", "BGR")
-
+tfr_countries <- c("SWE", "JPN", "FRATNP", "USA")
 
 # create labels
 cntry_labels <- setNames(
@@ -29,6 +29,11 @@ cntry_labels <- setNames(
     ),
     tfr_countries
 )
+
+# Fix France
+cntry_labels[[3]] <- "France"
+
+
 
 # download data
 tfr <- list()
@@ -42,6 +47,7 @@ for (i in seq_along(tfr_countries)) {
     )
     tfr[[i]]$CNTRY <- tfr_countries[i]
 }
+
 
 # combine data
 tfr_comb <- do.call(dplyr::bind_rows, tfr) %>%
@@ -61,7 +67,7 @@ tfr_plot <- tfr_comb %>%
         breaks = seq(1900, 2020, 20)
     ) +
     scale_color_manual(
-        values = park_palette("Saguaro"),
+        values = saguaro,
         labels = cntry_labels
     ) +
     scale_linetype_manual(
@@ -70,7 +76,7 @@ tfr_plot <- tfr_comb %>%
     ) +
     labs(
         x = "", y = "Total Fertility Rate",
-        caption = "Source: Human Fertility Database (2023)",
+        caption = "Source: Human Fertility Database (2024)",
         title = "Total Fertility Rate in selected countries"
     ) +
     annotate("text",
@@ -78,7 +84,7 @@ tfr_plot <- tfr_comb %>%
         label = "Replacement-level fertility"
     ) +
     theme(
-        legend.position = c(0.09, 0.13),
+        legend.position = c(0.9, 0.88),
         legend.text = element_text(size = 16),
         legend.background = element_rect(
             linetype = "solid",
