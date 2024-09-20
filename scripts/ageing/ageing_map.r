@@ -34,7 +34,7 @@ nuts3 <-
     st_transform(3035)
 
 age_dat <- get_eurostat("demo_r_pjanind3", time_format = "num") %>%
-    filter(indic_de == "MEDAGEPOP", TIME_PERIOD == 2020)
+    filter(indic_de == "MEDAGEPOP", TIME_PERIOD == 2022)
 
 # map settings
 
@@ -70,18 +70,17 @@ age_map <- med_age %>%
         linewidth = 0.1, alpha = 1
     ) +
     coord_sf(xlim = xlim, ylim = ylim, expand = FALSE) +
-    scale_fill_manual("Median Age (2020)",
+    scale_fill_manual("Median Age (2022)",
         values = self_palette,
         na.value = "#a7a7a7"
     ) +
-    labs(caption = "Source: Eurostat (2023)") +
+    labs(caption = "Source: Eurostat (2024)") +
     theme(
         axis.text = element_blank(),
         axis.ticks = element_blank(),
         legend.position = c(0.88, 0.88)
     ) +
     annotation_scale(height = unit(0.15, "cm"))
-
 
 # save map
 ggsave(
