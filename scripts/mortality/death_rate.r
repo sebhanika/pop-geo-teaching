@@ -9,10 +9,11 @@ library(tidyr)
 library(HMDHFDplus)
 library(ggthemes)
 library(countrycode)
-library(nationalparkcolors)
+# library(nationalparkcolors)
 
 source("scripts/0_config.R")
 source("scripts/0_settings.R")
+
 
 # Load data --------------
 
